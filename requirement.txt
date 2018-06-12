@@ -1,0 +1,4 @@
+six==1.10.0
+pyserial==3.4
+beautifulsoup==3.2.1
+selenium==3.12.0
