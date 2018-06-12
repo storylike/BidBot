@@ -4,6 +4,9 @@ import beautifulsoup
 
 class YFFS(BasePolicy):
     def __init__(self):
+        """
+        Init method.
+        """
         self.name = 'BASE'
         self.current_bid_list = []
         # biddict: {bidnum:[NotRecentlyOccurredRounds, LastBidCount]}
@@ -12,21 +15,29 @@ class YFFS(BasePolicy):
                         }
         pass
     def GetHistoryData(self, driver):
-    '''
-    This policy model need to get enough history data for analysis.
-    '''
+        """
+        This policy model need to get enough history data for analysis.
+        :param driver:
+        :return:
+        """
         soup = BeautifulSoup.BeautifulSoup()
         return historydata
     def UpdateHistoryData(self, driver):
-    '''
+        """
         When time pass by, this history data need to be updated as new data is generated
-    '''
+        :param self:
+        :param driver:
+        :return:
+        """
         return historydata
     def Predict(self, data):
-    '''
+        """
         Policy core functionality. In this method, latest history data is analyzed and candidate number list for next
         round is generated.
-    '''
+        :param self:
+        :param data:
+        :return:
+        """
         predicted = self.biddict
         return predicted
     def StartBid(self, predicted):
@@ -75,12 +86,23 @@ class YFFS(BasePolicy):
 
 
     def EndBid(self):
+        """
+        End biding, clean up.
+        :param self: 
+        :return: 
+        """
         self.logger("Round {round} end, policy:{name}, bid number(s): {numlist}".format( \
             round = self.round \
             name = self.name \
             numlist = str(self.current_bid_list) \
             ))
     def GotoBidPage(self, driver):
+        """
+        Go to biding page.
+        :param self:
+        :param driver:
+        :return:
+        """
         # Click SSC link tag in main page
         driver.find_elements_by_class_name('product_01')[0].click()
 

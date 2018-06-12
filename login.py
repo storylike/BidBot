@@ -38,20 +38,24 @@ top = Y
 right = X + formwidth
 bottom = Y + formheight
 
-if driver.get_screenshot_as_file('temp\\screenshot.png'):
-	img = Image.open('temp\\screenshot.png')
-	imgform = img.crop((left, top, right, bottom))
-	imgform.save('temp\\screenshot_form.png')
-	# vcode position relative to form
-	imgvcode = imgform.crop((84, 203, 148, 222))
-	imgvcode.show()
-	vcode = input("vcode is:")
-	print vcode
-	imgvcode.save('vcodes\\' + str(vcode) + '.png')
-else:
-	raise VcodeCaptureFailure
+if os.path.exists('temp\\screenshot.png'):
+	os.remove('temp\\screenshot.png')
+if os.path.exists('temp\\screenshot_form.png'):
+	os.remove('temp\\screenshot_form.png')
+time.sleep(5)
+driver.get_screenshot_as_file('temp\\screenshot.png')
+img = Image.open('temp\\screenshot.png')
+imgform = img.crop((left, top, right, bottom))
+imgform.save('temp\\screenshot_form.png')
+# vcode position relative to form
+imgvcode = imgform.crop((84, 203, 148, 222))
+imgvcode.show()
+vcode = input("vcode is:")
+print vcode
+imgvcode.save('vcodes\\' + str(vcode) + '.png')
 
-driver.find_element_by_id('authnum').send_keys(vcode)
+
+driver.find_element_by_id('authnum').send_keys(str(vcode))
 driver.find_element_by_id('send-button').click()
 
 time.sleep(5)

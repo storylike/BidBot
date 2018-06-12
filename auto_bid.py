@@ -8,18 +8,34 @@ from selenium.webdriver.support.ui import Select
 from PIL import Image
 from pytesser import pytesser
 import time
+import random
 from config import DATETIMEFMT, BID_URL, GL_ROOT, USER, PASSWORD
 
 
 Class BidRobot(object):
-    def __init__(self, URL):
+    """
+    BidBot is a automatic biding machine.
+    """
+    def __init__(self, driver):
+        """
+        Init method.
+        :param self:
+        :param driver:
+        :return:
+        """
         self.root_url = BID_URL
         self.round = 0
         opts = FirefoxOptions()
         opts.add_argument("--headless")
-        self.driver = webdriver.Firefox(firefox_options=opts)
+        self.driver = driver
 
     def load_page(self, url = self.root_url):
+        """
+        Load page method.
+        :param self:
+        :param url:
+        :return:
+        """
         try:
             self.driver.get(url)
             logger("Get the driver of %s" % self.root_url)
@@ -27,14 +43,32 @@ Class BidRobot(object):
             logger("Fail to get the driver, because of %s." % e)
 
     def refresh(self, driver):
+        """
+        Refresh the main page.
+        :param self:
+        :param driver:
+        :return:
+        """
         driver.refresh()
     def logger(self, logmsg):
+        """
+        Logger method of this class.
+        :param self:
+        :param logmsg:
+        :return:
+        """
         date_today = time.strftime('Y-%m-%d')
         logtime = time.strftime(DATETIMEFMT)
         with open('Log\\log_' + date_today + '.txt', 'a+') as log:
             log.write(' '.join(logtime, log_string))
         print ' '.join(logtime, log_string)
     def handle_vcode(self, driver):
+        """
+        This method handles verification codes.
+        :param self:
+        :param driver:
+        :return:
+        """
         # Get login_form
         loginform = driver.find_element_by_id('login_form')
         formwidth = loginform.size['width']
@@ -45,7 +79,13 @@ Class BidRobot(object):
         top = Y
         right = X + formwidth
         bottom = Y + formheight
-        # Capture current screenshot
+        # Remove temp image captures in temp dir
+        if os.path.exists('temp\\screenshot.png'):
+            os.remove('temp\\screenshot.png')
+        if os.path.exists('temp\\screenshot_form.png'):
+            os.remove('temp\\screenshot_form.png')
+        time.sleep(5)
+        # Time to capture current screenshots
         if driver.get_screenshot_as_file('temp\\screenshot.png'):
             img = Image.open('temp\\screenshot.png')
             imgform = img.crop((left, top, right, bottom))
@@ -61,6 +101,14 @@ Class BidRobot(object):
 
 
     def login(self, driver, userid=USER, password=PASSWORD):
+        """
+        This is login method.
+        :param self:
+        :param driver:
+        :param userid:
+        :param password:
+        :return:
+        """
 
         user = driver.find_element_by_id('login').text
         print user
@@ -82,8 +130,25 @@ Class BidRobot(object):
         driver.find_elements_by_class_name('ui-dialog-button')[0].click()
         time.sleep(3)
 
+    def SafeLogOut(self, driver):
+        """
+        This is safe logout method.
+        :param self:
+        :param driver:
+        :return:
+        """
+        driver.find_element_by_css_selector("a[class='btn_logout btn b2'][id='logout']").click()
+        confirm_box = \
+        driver.find_elements_by_css_selector("button[type='button'][i-id='ok'][class='fix-ui-dialog-autofocus']")[-1]
+        confirm_box.click()
+        time.sleep(2)
 
     def WaitForNextBidCycle(self):
+        """
+        Wait for next biding cycle.
+        :param self:
+        :return:
+        """
         cur_time = time.strftime('%H:%M:%S')
         if (cur_time > '21:58:00') and (cur_time < '10:00:00'):
             # I'm only focusing on time period of 10:00 - 22.00 every day, with drawing lottery interval being 10 minutes.
@@ -93,6 +158,11 @@ Class BidRobot(object):
 
 
 def logger(log_string):
+    """
+    Logger function for main.
+    :param log_string:
+    :return:
+    """
     date_today = time.strftime('Y-%m-%d')
     logtime = time.strftime(DATETIMEFMT)
     with open('Log\\log_'+date_today+'.txt', 'a+') as log:
@@ -103,6 +173,9 @@ def logger(log_string):
 
 
 if __name__ == '__main__':
+    """
+    This is main loop.
+    """
     # Prepare Selenium driver
     chromedriver = CHROME_DRIVER_PATH
     os.environ["webdriver.chrome.driver"] = chromedriver
@@ -112,7 +185,7 @@ if __name__ == '__main__':
     print cookie
     time.sleep(2)
 
-    Bot = BidRobot()
+    Bot = BidRobot(driver)
     Bot.login(driver, USER, PASSWORD)
     Policy1 = YFFS()
 
@@ -136,14 +209,21 @@ if __name__ == '__main__':
             predicted = Policy1.Predict(driver)
             # Start biding
             Policy1.StartBid(driver, predicted)
+            time.sleep(random.randomint(10,30))
 
             ##
             ## Policy 2 handling:
             ##
 
+            time.sleep(random.randomint(10, 30))
+
             ##
             ## Policy 3 handling:
             ##
+
+
+            time.sleep(random.randomint(10, 30))
+
 
 
             # Waiting for next available biding time window
@@ -154,6 +234,7 @@ if __name__ == '__main__':
 
         except exceptions.KeyboardInterrupt:
             loggger("Keyboard interrupt, ending biding procedure!")
+            Bot.SafeLogout(self.driver)
             return 1
         except LoginErr:
             logger("Login failed for 3 rounds, this account may has been frozon, please contact JK support!")
