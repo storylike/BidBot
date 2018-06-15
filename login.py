@@ -3,7 +3,8 @@ from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.common.action_chains import ActionChains
 from selenium.webdriver.support.ui import Select
 from PIL import Image
-from pytesser import pytesser
+from bs4 import BeautifulSoup
+#from pytesser import pytesser
 import time
 import os
 
@@ -14,14 +15,8 @@ driver.get('')
 
 cookie = driver.get_cookies()
 
-print cookie
-
-time.sleep(2)
-
-user = driver.find_element_by_id('login').text
-print user
 driver.find_element_by_id('login').send_keys('storylike1')
-user = driver.find_element_by_id('pass').text
+#user = driver.find_element_by_id('pass').text
 
 driver.find_element_by_id('pass').send_keys('Clariion1')
 #driver.find.element_by_id('pass').clear()
@@ -51,7 +46,7 @@ imgform.save('temp\\screenshot_form.png')
 imgvcode = imgform.crop((84, 203, 148, 222))
 imgvcode.show()
 vcode = input("vcode is:")
-print vcode
+print(vcode)
 imgvcode.save('vcodes\\' + str(vcode) + '.png')
 
 

@@ -1,4 +1,8 @@
 *.pyc
 .idea
 .idea/*
+Data/*
+config.py
+debug.log
+Log/*
 ghostdriver.log
