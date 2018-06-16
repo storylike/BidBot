@@ -112,10 +112,11 @@ class YFFS(BasePolicy):
         """
         self.logger("Policy: YFFS, StartBiding...")
         self.logger(str(self.biddict))
-        time.sleep(40)
+        time.sleep(60)
         for key, value in self.biddict.items():
             if (value[0] < 20) and (value[0] != 0xff) and (self.bidreferencetable[value[0]] > 0):
                 # Click WuXing
+                time.sleep(3)
                 self.driver.find_element_by_css_selector("a[class='btn b0'][data-bettype='1'][data-subid='12345']").click()
                 time.sleep(1)
                 # Click BuDingWei
@@ -159,11 +160,11 @@ class YFFS(BasePolicy):
                 # Get last popped up dialog box, that's a bid order confirmation
                 confirm_box = self.driver.find_elements_by_css_selector("button[type='button'][i-id='ok'][class='fix-ui-dialog-autofocus']")[-1]
                 confirm_box.click()
-                time.sleep(1)
+                time.sleep(3)
                 # At last, we should update biddict[key][1] to the actual value we are placing a bid
                 self.biddict[key][1] = self.bidreferencetable[self.biddict[key][0]]
                 self.logger("Biding done with num:{0}, amount:{1}".format(str(key), str(self.biddict[key][1])))
-                time.sleep(1)
+                time.sleep(2)
 
 
     def EndBid(self):

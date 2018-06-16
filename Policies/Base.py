@@ -68,7 +68,7 @@ class BasePolicy(object):
         tempdata = self.CrawlAndBuildDataTable()
         while len(tempdata) == len(self.datatoday):
             self.logger("Data identical to previous fetched, sleep 20 seconds and retry.")
-            time.sleep(40)
+            time.sleep(30)
             tempdata = self.CrawlAndBuildDataTable()
         assert len(tempdata) == len(self.datatoday) + 1, "Unexpected data length captured!"
         self.logger("New data record found: {}. Start updating data.".format(str(tempdata[-1])))
