@@ -7,6 +7,7 @@ import datetime
 import sys
 sys.path.append('..')
 from config import LSSC_URL, LSSC_DATEFORMAT, DATETIMEFMT
+from urllib.error import URLError
 
 class BasePolicy(object):
     """
@@ -25,11 +26,18 @@ class BasePolicy(object):
         This method crawls desired page, then build and store data we desire.
         :return:
         """
+        Retries = 3
         datatable = []
         self.logger("Start Crawling today's LSSC data...")
         date_today = datetime.datetime.now().strftime(LSSC_DATEFORMAT)
         URL = ''.join([LSSC_URL, date_today, '_', date_today])
-        page = urllib.request.urlopen(URL)
+        for i in range(Retries):
+            try:
+                page = urllib.request.urlopen(URL)
+                break
+            except URLError:
+                self.logger("Failed to open URL, retries = {}".format(str(i)))
+
         content = page.read()
         soup = BeautifulSoup(content, 'html.parser')
         tablelist = soup.findAll("td", attrs={"class":"red big"})
@@ -58,7 +66,7 @@ class BasePolicy(object):
         """
         self.logger("Trying to update today's data...")
         tempdata = self.CrawlAndBuildDataTable()
-        while(len(tempdata) == len(self.datatoday)):
+        while len(tempdata) == len(self.datatoday):
             self.logger("Data identical to previous fetched, sleep 20 seconds and retry.")
             time.sleep(40)
             tempdata = self.CrawlAndBuildDataTable()
