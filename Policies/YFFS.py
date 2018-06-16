@@ -63,11 +63,17 @@ class YFFS(BasePolicy):
         When each new round starts, we will need to update biddict.
         :return:
         """
-        for x in set(self.datatoday[-1]):
-            self.biddict[int(x)][0] = 0
-        for key,value in self.biddict.items():
-            if self.biddict[key][0] != 0:
+        self.logger("In UpdateBidDict")
+        self.logger("datatoday[-1] = {}".format(str(self.datatoday[-1])))
+        self.logger("Before BidDict Update:")
+        self.logger("    BidDict: {}".format(str(self.biddict)))
+        for key, value in self.biddict.items():
+            if str(key) in set(self.datatoday[-1]):
+                self.biddict[key][0] = 0
+            else:
                 self.biddict[key][0] = self.biddict[key][0] + 1
+        self.logger("After BidDict Update:")
+        self.logger("    BidDict: {}".format(str(self.biddict)))
 
     def GetHistoryData(self, driver):
         """
@@ -108,6 +114,9 @@ class YFFS(BasePolicy):
         self.logger(str(self.biddict))
         for key, value in self.biddict.items():
             if (value[0] < 20) and (value[0] != 0xff) and (self.bidreferencetable[value[0]] > 0):
+                # Click WuXing
+                self.driver.find_element_by_css_selector("a[class='btn b0'][data-bettype='1'][data-subid='12345']").click()
+                time.sleep(2)
                 # Click BuDingWei
                 self.driver.find_element_by_css_selector("a[class='btn b0'][data-bettype='5'][data-subid='1123']").click()
                 time.sleep(2)
@@ -152,7 +161,7 @@ class YFFS(BasePolicy):
                 time.sleep(2)
                 # At last, we should update biddict[key][1] to the actual value we are placing a bid
                 self.biddict[key][1] = self.bidreferencetable[self.biddict[key][0]]
-                self.logger("       Biding done with num:{0}, amount:{1}".format(str(key), str(self.biddict[key][1])))
+                self.logger("Biding done with num:{0}, amount:{1}".format(str(key), str(self.biddict[key][1])))
                 time.sleep(2)
 
 

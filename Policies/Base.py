@@ -60,7 +60,7 @@ class BasePolicy(object):
         tempdata = self.CrawlAndBuildDataTable()
         while(len(tempdata) == len(self.datatoday)):
             self.logger("Data identical to previous fetched, sleep 20 seconds and retry.")
-            time.sleep(20)
+            time.sleep(40)
             tempdata = self.CrawlAndBuildDataTable()
         assert len(tempdata) == len(self.datatoday) + 1, "Unexpected data length captured!"
         self.logger("New data record found: {}. Start updating data.".format(str(tempdata[-1])))
@@ -68,6 +68,9 @@ class BasePolicy(object):
         #    assert self.datatoday[index] == items, \
         #        "datatoday[{0}]={1}, tempdata[{0}]={2}".format(str(index), str(self.datatoday[index]), str(items))
         self.datatoday = tempdata
+        for index,items in enumerate(self.datatoday):
+            self.logger("In UpdateTodayData, Datatoday:")
+            self.logger("      {:0>3}.  {}".format(str(index+1), items))
         self.lenghao_sorted = self.CountNumAndSort(self.datatoday)
         self.updated = True
 
