@@ -65,6 +65,9 @@ class YFFS(BasePolicy):
         """
         for x in set(self.datatoday[-1]):
             self.biddict[int(x)][0] = 0
+        for key,value in self.biddict.items():
+            if self.biddict[key][0] != 0:
+                self.biddict[key][0] = self.biddict[key][0] + 1
 
     def GetHistoryData(self, driver):
         """
@@ -104,7 +107,7 @@ class YFFS(BasePolicy):
         self.logger("Policy: YFFS, StartBiding...")
         self.logger(str(self.biddict))
         for key, value in self.biddict.items():
-            if (value[0] < 20) and (value[0] != 0xff):
+            if (value[0] < 20) and (value[0] != 0xff) and (self.bidreferencetable[value[0]] > 0):
                 # Click BuDingWei
                 self.driver.find_element_by_css_selector("a[class='btn b0'][data-bettype='5'][data-subid='1123']").click()
                 time.sleep(2)
@@ -170,8 +173,8 @@ class YFFS(BasePolicy):
         :return:
         """
         # Click SSC link tag in main page
-        self.driver.find_elements_by_class_name('product_01')[0].click()
-        time.sleep(5)
+        #self.driver.find_elements_by_class_name('product_01')[0].click()
+        #time.sleep(5)
         # Cancel POPUP after SSC Link click
         if self.driver.find_elements_by_class_name('dont-popup')[0].is_displayed():
             self.driver.find_elements_by_class_name('dont-popup')[0].click()

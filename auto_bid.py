@@ -145,6 +145,9 @@ class BidRobot(object):
         driver.find_elements_by_class_name('ui-dialog-button')[0].click()
         time.sleep(3)
 
+        self.driver.find_elements_by_class_name('product_01')[0].click()
+        time.sleep(5)
+
     def SafeLogOut(self, driver):
         """
         This is safe logout method.
@@ -221,7 +224,7 @@ if __name__ == '__main__':
             Policy1.UpdateBidDict()
             # Start biding
             Policy1.StartBid()
-            time.sleep(random.randomint(10,30))
+            time.sleep(random.randint(10,30))
 
             ##
             ## Policy 2 handling:
