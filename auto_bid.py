@@ -6,13 +6,15 @@ from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.common.action_chains import ActionChains
 from selenium.webdriver.support.ui import Select
 from PIL import Image
-from pytesser import pytesser
+#from pytesser import pytesser
 import time
 import random
-from config import DATETIMEFMT, BID_URL, GL_ROOT, USER, PASSWORD
+from config import DATETIMEFMT, BID_URL, GL_ROOT, USER, PASSWORD, CHROME_DRIVER_PATH
+from Policies.YFFS import YFFS
 
 
-Class BidRobot(object):
+
+class BidRobot(object):
     """
     BidBot is a automatic biding machine.
     """
@@ -29,7 +31,7 @@ Class BidRobot(object):
         opts.add_argument("--headless")
         self.driver = driver
 
-    def load_page(self, url = self.root_url):
+    def load_page(self, url = BID_URL):
         """
         Load page method.
         :param self:
@@ -39,10 +41,10 @@ Class BidRobot(object):
         try:
             self.driver.get(url)
             logger("Get the driver of %s" % self.root_url)
-        except Exception, e:
-            logger("Fail to get the driver, because of %s." % e)
+        except Exception:
+            logger("Fail to get the driver, because of exceptions.")
 
-    def refresh(self, driver):
+    def Refresh(self, driver):
         """
         Refresh the main page.
         :param self:
@@ -50,6 +52,17 @@ Class BidRobot(object):
         :return:
         """
         driver.refresh()
+        time.sleep(5)
+        # Now, we are logged in, but need to handle some annoying pop-ups
+        # Pop up Confirmation 1
+        if self.driver.find_element_by_id('btnClose').is_displayed():
+            self.driver.find_element_by_id('btnClose').click()
+            time.sleep(3)
+        # Pop up Confirmation 2
+        if self.driver.find_elements_by_class_name('ui-dialog-button')[0].is_displayed():
+            self.driver.find_elements_by_class_name('ui-dialog-button')[0].click()
+            time.sleep(3)
+
     def logger(self, logmsg):
         """
         Logger method of this class.
@@ -57,11 +70,11 @@ Class BidRobot(object):
         :param logmsg:
         :return:
         """
-        date_today = time.strftime('Y-%m-%d')
+        date_today = time.strftime('%Y-%m-%d')
         logtime = time.strftime(DATETIMEFMT)
         with open('Log\\log_' + date_today + '.txt', 'a+') as log:
-            log.write(' '.join(logtime, log_string))
-        print ' '.join(logtime, log_string)
+            log.write(' '.join([logtime, logmsg, '\n']))
+        print(' '.join([logtime, logmsg, '\n']))
     def handle_vcode(self, driver):
         """
         This method handles verification codes.
@@ -94,10 +107,12 @@ Class BidRobot(object):
             imgvcode = imgform.crop((84, 203, 148, 222))
             imgvcode.show()
             vcode = input("vcode is:")
-            print vcode
+            print(vcode)
             imgvcode.save('vcodes\\' + str(vcode) + '.png')
         else:
             self.logger("Screenshot failed!")
+
+        return vcode
 
 
     def login(self, driver, userid=USER, password=PASSWORD):
@@ -111,7 +126,7 @@ Class BidRobot(object):
         """
 
         user = driver.find_element_by_id('login').text
-        print user
+        print(user)
         driver.find_element_by_id('login').send_keys(userid)
         user = driver.find_element_by_id('pass').text
 
@@ -163,12 +178,12 @@ def logger(log_string):
     :param log_string:
     :return:
     """
-    date_today = time.strftime('Y-%m-%d')
+    date_today = time.strftime('%Y-%m-%d')
     logtime = time.strftime(DATETIMEFMT)
     with open('Log\\log_'+date_today+'.txt', 'a+') as log:
-        log.write(' '.join(logtime, log_string))
+        log.write(' '.join([logtime, log_string, '\n']))
 
-    print ' '.join(logtime, log_string)
+    print(' '.join([logtime, log_string, '\n']))
 
 
 
@@ -182,56 +197,54 @@ if __name__ == '__main__':
     driver = webdriver.Chrome(chromedriver)
     driver.get(BID_URL)
     cookie = driver.get_cookies()
-    print cookie
+    print(cookie)
     time.sleep(2)
 
     Bot = BidRobot(driver)
     Bot.login(driver, USER, PASSWORD)
-    Policy1 = YFFS()
+    Policy1 = YFFS(driver)
+    Policy1.GetTodayData()
+    Policy1.CreateBidDict()
 
     while True:
         try:
-        """
-            This is the main loop adopting all available policies and bid out orders according to these policies.
-        """
             # Reload main page
-            Bot.Refresh()
-
+            #Bot.Refresh(driver)
             ##
             ## Policy 1 handling:
             ##
             # Goto biding page
-            Policy1.GoToBidPage(driver)
+            Policy1.GotoBidPage()
             # Get last biding history
-            Policy1.GetHistoryData(driver, )
-            data = Policy1.UpdateHistoryData(driver)
-            # Predict next bid details according to history data
-            predicted = Policy1.Predict(driver)
+
+            Policy1.UpdateTodayData()
+            Policy1.UpdateBidDict()
             # Start biding
-            Policy1.StartBid(driver, predicted)
+            Policy1.StartBid()
             time.sleep(random.randomint(10,30))
 
             ##
             ## Policy 2 handling:
             ##
 
-            time.sleep(random.randomint(10, 30))
+            #time.sleep(random.randomint(1, 30))
 
             ##
             ## Policy 3 handling:
             ##
 
 
-            time.sleep(random.randomint(10, 30))
+            #time.sleep(random.randomint(10, 30))
 
 
 
             # Waiting for next available biding time window
-            Bot.WaitForNextBidCycle(driver)
+            #Bot.WaitForNextBidCycle(driver)
+        except exceptions:
+            logger("Main loop break, because of exceptions")
+            exit()
 
-
-
-
+    """
         except exceptions.KeyboardInterrupt:
             loggger("Keyboard interrupt, ending biding procedure!")
             Bot.SafeLogout(self.driver)
@@ -248,7 +261,7 @@ if __name__ == '__main__':
         else:
             logger("Unknown error! Stop biding.")
             return 5
-
+    """
 
 
 

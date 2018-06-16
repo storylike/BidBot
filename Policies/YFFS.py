@@ -1,19 +1,71 @@
-from Base import BasePolicy
-import beautifulsoup
+import sys
+import time
+#sys.path.append('.')
+from .Base import BasePolicy
+from bs4 import BeautifulSoup
+from selenium.webdriver.common.keys import Keys
+from selenium.webdriver.common.action_chains import ActionChains
+from selenium.webdriver.support.ui import Select
 
+sys.path.append('..')
+from config import BID_UNIT_VALUE_MAP
 
 class YFFS(BasePolicy):
-    def __init__(self):
+    def __init__(self, driver):
         """
         Init method.
         """
+        super().__init__(driver)
         self.name = 'BASE'
+        self.driver = driver
+        # Unit: FEN
+        self.bidunit = BID_UNIT_VALUE_MAP["FEN"]
+        self.bidreferencetable = {0:0, 1:0, 2:0, 3:1, 4:2, 5:4, 6:8, 7:16, 8:32, 9:64, \
+                             10:200, 11:400, 13:800, 14:1600, 15:3200, 16:6400, 17:12800, 18:25600, \
+                             19:20000, 20:20000
+                             }
         self.current_bid_list = []
         # biddict: {bidnum:[NotRecentlyOccurredRounds, LastBidCount]}
-        self.biddict = {"0":[0,0], "1":[0,0], "2":[0,0], "3":[0,0], "4":[0,0], \
-                        "5":[0,0], "6":[0,0], "7":[0,0], "8":[0,0], "9":[0,0] \
+        self.biddict = {0:[0xff,0], 1:[0xff,0], 2:[0xff,0], 3:[0xff,0], 4:[0xff,0], \
+                        5:[0xff,0], 6:[0xff,0], 7:[0xff,0], 8:[0xff,0], 9:[0xff,0] \
                         }
-        pass
+
+
+    def CreateBidDict(self):
+        """
+        Fulfill NotRecentlyOccurredRounds fields in biddict.
+        :return:
+        """
+        self.current_bid_list = self.datatoday
+        self.logger("YFFS Policy: CreateBidDict start...")
+        self.logger("YFFS Policy: today's data:")
+        for items in self.current_bid_list:
+            self.logger("        {0}".format(str(items)))
+        for key,value in self.biddict.items():
+            index = -1
+            increment = 0
+            NotFound = False
+            while(str(key) not in self.datatoday[index-increment]):
+                increment = increment + 1
+                if increment >= 20:
+                    NotFound = True
+                    break
+            if NotFound is False:
+                self.biddict[key][0] = increment
+
+        self.logger("YFFS Policy: biddict:")
+        for key,value in self.biddict.items():
+            self.logger("       {}: {} {}".format(str(key), str(value[0]), str(value[1])))
+
+
+    def UpdateBidDict(self):
+        """
+        When each new round starts, we will need to update biddict.
+        :return:
+        """
+        for x in set(self.datatoday[-1]):
+            self.biddict[int(x)][0] = 0
+
     def GetHistoryData(self, driver):
         """
         This policy model need to get enough history data for analysis.
@@ -22,6 +74,7 @@ class YFFS(BasePolicy):
         """
         soup = BeautifulSoup.BeautifulSoup()
         return historydata
+
     def UpdateHistoryData(self, driver):
         """
         When time pass by, this history data need to be updated as new data is generated
@@ -30,6 +83,7 @@ class YFFS(BasePolicy):
         :return:
         """
         return historydata
+
     def Predict(self, data):
         """
         Policy core functionality. In this method, latest history data is analyzed and candidate number list for next
@@ -40,73 +94,85 @@ class YFFS(BasePolicy):
         """
         predicted = self.biddict
         return predicted
-    def StartBid(self, predicted):
+
+    def StartBid(self):
         """
-        :param self:
-        :param bidlist:
+        Start bidding.
+        :param biddict:
         :return:
         """
-        # Click BuDingWei
-        driver.find_element_by_css_selector("a[class='btn b0'][data-bettype='5'][data-subid='1123']").click()
-
-        # WuXingYiMa BuDingWei
-        driver.find_element_by_css_selector(
-            "input[name='r0'][type='radio'][class='pointer'][value='2_5_112345']").click()
-        # Select Bid Number, 5, e.g.
-        driver.find_element_by_css_selector("a[data-num='5'][class='isNum']").click()
-        # driver.implicitly_wait(5)
-
-        # Drag slider bar to leftmost to get most bonus rate
-        dragsource = driver.find_element_by_css_selector(
-            "span[class='ui-slider-handle ui-state-default ui-corner-all'][tabindex='0']")
-        dragtarget = driver.find_element_by_css_selector("i[class='fa fa-plus-circle fs18 minus']")
-        ActionChains(driver).drag_and_drop(dragsource, dragtarget).perform()
-
-        # Set Bid value to 1
-        driver.find_element_by_id('buyamount').clear()
-        driver.find_element_by_id('buyamount').send_keys('1')
-
-        # Select bid unit
-        # value = 1 : yuan
-        # value = 10 : jiao
-        # value = 100 : fen
-        select = Select(driver.find_element_by_id("selectdollarunit"))
-        select.select_by_value("10")
-
-        # Add to bid list
-        driver.find_element_by_css_selector("a[class='btn2'][id='seleall']").click()
-
-        # Confirm bid
-        driver.find_element_by_css_selector("a[class='btn b3'][id='gamebuy']").click()
-
-        # Handle pop ups after bid confirmation
-        # Get last popped up dialog box, that's a bid order confirmation
-        confirm_box = driver.find_elements_by_css_selector("button[type='button'][i-id='ok'][class='fix-ui-dialog-autofocus']")[-1]
-        confirm_box.click()
+        self.logger("Policy: YFFS, StartBiding...")
+        self.logger(str(self.biddict))
+        for key, value in self.biddict.items():
+            if (value[0] < 20) and (value[0] != 0xff):
+                # Click BuDingWei
+                self.driver.find_element_by_css_selector("a[class='btn b0'][data-bettype='5'][data-subid='1123']").click()
+                time.sleep(2)
+                # WuXingYiMa BuDingWei
+                self.driver.find_element_by_css_selector(
+                    "input[name='r0'][type='radio'][class='pointer'][value='2_5_112345']").click()
+                time.sleep(2)
+                # Select Bid Number, 5, e.g.
+                # driver.find_element_by_css_selector("a[data-num='5'][class='isNum']").click()
+                # We should apply actual bid num from biddict:
+                self.driver.find_element_by_css_selector("a[data-num={0}][class='isNum']".format( \
+                    ''.join(["\'", str(key), "\'"]))).click()
+                time.sleep(2)
+                # Drag slider bar to leftmost to get most bonus rate
+                dragsource = self.driver.find_element_by_css_selector(
+                    "span[class='ui-slider-handle ui-state-default ui-corner-all'][tabindex='0']")
+                dragtarget = self.driver.find_element_by_css_selector("i[class='fa fa-plus-circle fs18 minus']")
+                ActionChains(self.driver).drag_and_drop(dragsource, dragtarget).perform()
+                time.sleep(2)
+                # Set Bid value according to biddict[key][1]
+                self.driver.find_element_by_id('buyamount').clear()
+                time.sleep(2)
+                self.driver.find_element_by_id('buyamount').send_keys(str(self.bidreferencetable[self.biddict[key][0]]))
+                time.sleep(2)
+                # Select bid unit
+                # value = 1 : yuan
+                # value = 10 : jiao
+                # value = 100 : fen
+                select = Select(self.driver.find_element_by_id("selectdollarunit"))
+                select.select_by_value(str(self.bidunit))
+                time.sleep(2)
+                # Add to bid list
+                self.driver.find_element_by_css_selector("a[class='btn2'][id='seleall']").click()
+                time.sleep(2)
+                # Confirm bid
+                self.driver.find_element_by_css_selector("a[class='btn b3'][id='gamebuy']").click()
+                time.sleep(3)
+                # Handle pop ups after bid confirmation
+                # Get last popped up dialog box, that's a bid order confirmation
+                confirm_box = self.driver.find_elements_by_css_selector("button[type='button'][i-id='ok'][class='fix-ui-dialog-autofocus']")[-1]
+                confirm_box.click()
+                time.sleep(2)
+                # At last, we should update biddict[key][1] to the actual value we are placing a bid
+                self.biddict[key][1] = self.bidreferencetable[self.biddict[key][0]]
+                self.logger("       Biding done with num:{0}, amount:{1}".format(str(key), str(self.biddict[key][1])))
+                time.sleep(2)
 
 
     def EndBid(self):
         """
         End biding, clean up.
-        :param self: 
-        :return: 
+        :return:
         """
         self.logger("Round {round} end, policy:{name}, bid number(s): {numlist}".format( \
-            round = self.round \
-            name = self.name \
+            round = self.round, \
+            name = self.name, \
             numlist = str(self.current_bid_list) \
             ))
-    def GotoBidPage(self, driver):
+
+    def GotoBidPage(self):
         """
-        Go to biding page.
-        :param self:
-        :param driver:
+        Goto Bid page.
         :return:
         """
         # Click SSC link tag in main page
-        driver.find_elements_by_class_name('product_01')[0].click()
-
+        self.driver.find_elements_by_class_name('product_01')[0].click()
+        time.sleep(5)
         # Cancel POPUP after SSC Link click
-        if driver.find_elements_by_class_name('dont-popup')[0].is_displayed():
-            driver.find_elements_by_class_name('dont-popup')[0].click()
-            driver.find_elements_by_class_name('fa-close')[0].click()
+        if self.driver.find_elements_by_class_name('dont-popup')[0].is_displayed():
+            self.driver.find_elements_by_class_name('dont-popup')[0].click()
+            self.driver.find_elements_by_class_name('fa-close')[0].click()
