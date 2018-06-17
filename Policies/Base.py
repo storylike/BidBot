@@ -16,6 +16,7 @@ class BasePolicy(object):
     def __init__(self, driver):
         self.name = 'BASE'
         self.updated = False
+        self.round = 0xff
         self.driver = driver
         self.current_bid_list = []
         self.datatoday = []
@@ -37,7 +38,7 @@ class BasePolicy(object):
                 break
             except URLError:
                 self.logger("Failed to open URL, retries = {}".format(str(i)))
-
+            time.sleep(15)
         content = page.read()
         soup = BeautifulSoup(content, 'html.parser')
         tablelist = soup.findAll("td", attrs={"class":"red big"})
@@ -76,6 +77,7 @@ class BasePolicy(object):
         #    assert self.datatoday[index] == items, \
         #        "datatoday[{0}]={1}, tempdata[{0}]={2}".format(str(index), str(self.datatoday[index]), str(items))
         self.datatoday = tempdata
+        self.round = len(self.datatoday)
         for index,items in enumerate(self.datatoday):
             self.logger("In UpdateTodayData, Datatoday:")
             self.logger("      {:0>3}.  {}".format(str(index+1), items))

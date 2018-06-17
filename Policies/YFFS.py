@@ -21,8 +21,8 @@ class YFFS(BasePolicy):
         # Unit: FEN
         self.bidunit = BID_UNIT_VALUE_MAP["JIAO"]
         self.bidreferencetable = {0:0, 1:0, 2:0, 3:1, 4:2, 5:4, 6:8, 7:16, 8:32, 9:64, \
-                             10:200, 11:400, 13:800, 14:1600, 15:3200, 16:6400, 17:12800, 18:25600, \
-                             19:20000, 20:20000
+                             10:200, 11:400, 12:800, 13:1600, 14:3200, 15:6400, 16:12800, 17:25600, 18:10000, \
+                             19:20000, 20:40000
                              }
         self.current_bid_list = []
         # biddict: {bidnum:[NotRecentlyOccurredRounds, LastBidCount]}
@@ -110,7 +110,7 @@ class YFFS(BasePolicy):
         :param biddict:
         :return:
         """
-        self.logger("Policy: YFFS, StartBiding...")
+        self.logger("Round:{} Policy: YFFS, StartBiding...". format(str(self.round)))
         self.logger(str(self.biddict))
         time.sleep(60)
         for key, value in self.biddict.items():
@@ -165,6 +165,7 @@ class YFFS(BasePolicy):
                 self.biddict[key][1] = self.bidreferencetable[self.biddict[key][0]]
                 self.logger("Biding done with num:{0}, amount:{1}".format(str(key), str(self.biddict[key][1])))
                 time.sleep(2)
+        self.logger("Round:{} Policy:YFFS End bidding...".format(str(self.round)))
 
 
     def EndBid(self):
