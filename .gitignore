@@ -2,6 +2,7 @@
 .idea
 .idea/*
 Data/*
+temp/*
 config.py
 debug.log
 Log/*
