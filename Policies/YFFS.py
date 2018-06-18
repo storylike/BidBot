@@ -20,9 +20,15 @@ class YFFS(BasePolicy):
         self.driver = driver
         # Unit: FEN
         self.bidunit = BID_UNIT_VALUE_MAP["JIAO"]
+        # OriginalTable
+        #self.bidreferencetable = {0:0, 1:0, 2:0, 3:1, 4:2, 5:4, 6:8, 7:16, 8:32, 9:64, \
+        #                     10:200, 11:400, 12:800, 13:1600, 14:3200, 15:6400, 16:12800, 17:25600, 18:10000, \
+        #                     19:20000, 20:40000
+        #                     }
+        # Stop losses at 17
         self.bidreferencetable = {0:0, 1:0, 2:0, 3:1, 4:2, 5:4, 6:8, 7:16, 8:32, 9:64, \
-                             10:200, 11:400, 12:800, 13:1600, 14:3200, 15:6400, 16:12800, 17:25600, 18:10000, \
-                             19:20000, 20:40000
+                             10:200, 11:400, 12:800, 13:1600, 14:3200, 15:6400, 16:12800, 17:25600, 18:0, \
+                             19:0, 20:0, 21:0, 22:0, 23:0, 24:0, 25:0, 26:0, 27:0, 28:0, 29:0, 30:0
                              }
         self.current_bid_list = []
         # biddict: {bidnum:[NotRecentlyOccurredRounds, LastBidCount]}
@@ -159,6 +165,7 @@ class YFFS(BasePolicy):
                 # Handle pop ups after bid confirmation
                 # Get last popped up dialog box, that's a bid order confirmation
                 confirm_box = self.driver.find_elements_by_css_selector("button[type='button'][i-id='ok'][class='fix-ui-dialog-autofocus']")[-1]
+                time.sleep(1)
                 confirm_box.click()
                 time.sleep(3)
                 # At last, we should update biddict[key][1] to the actual value we are placing a bid

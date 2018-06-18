@@ -46,7 +46,7 @@ if __name__ == '__main__':
 			numbers = line.split('.')[1].strip()
 			for k,v in temp_dict.items():
 				if (str(k) in set(list(numbers))) and (v in analysis_result.keys()):
-					if temp_dict[k] >= 15:
+					if temp_dict[k] >= 18:
 						print(' '.join([line.split(' ')[0], "号码:", str(k), "   ", str(temp_dict[k]), "次不中", "    期号.最终开出号码", line.split(' ')[1]]))
 					temp_dict[k] = 0
 					#print(temp_dict)
