@@ -112,16 +112,16 @@ class YFFS(BasePolicy):
         """
         self.logger("Round:{} Policy: YFFS, StartBiding...". format(str(self.round)))
         self.logger(str(self.biddict))
-        time.sleep(60)
+        time.sleep(40)
         for key, value in self.biddict.items():
-            if (value[0] < 20) and (value[0] != 0xff) and (self.bidreferencetable[value[0]] > 0):
+            if (value[0] < 20) and (value[0] != 0xff) and (value[0] in self.bidreferencetable) and (self.bidreferencetable[value[0]] > 0):
                 # Click WuXing
                 time.sleep(3)
                 self.driver.find_element_by_css_selector("a[class='btn b0'][data-bettype='1'][data-subid='12345']").click()
-                time.sleep(1)
+                time.sleep(2)
                 # Click BuDingWei
                 self.driver.find_element_by_css_selector("a[class='btn b0'][data-bettype='5'][data-subid='1123']").click()
-                time.sleep(1)
+                time.sleep(2)
                 # WuXingYiMa BuDingWei
                 self.driver.find_element_by_css_selector(
                     "input[name='r0'][type='radio'][class='pointer'][value='2_5_112345']").click()
@@ -164,7 +164,7 @@ class YFFS(BasePolicy):
                 # At last, we should update biddict[key][1] to the actual value we are placing a bid
                 self.biddict[key][1] = self.bidreferencetable[self.biddict[key][0]]
                 self.logger("Biding done with num:{0}, amount:{1}".format(str(key), str(self.biddict[key][1])))
-                time.sleep(2)
+                time.sleep(1)
         self.logger("Round:{} Policy:YFFS End bidding...".format(str(self.round)))
 
 

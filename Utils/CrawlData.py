@@ -19,8 +19,9 @@ date_end = datetime.datetime.strptime(END_DATE, LSSC_DATEFORMAT)
 date_temp = date_start
 
 while(date_temp < date_end):
-    URL = ''.join([LSSC_URL, date_temp.strftime("%Y-%m-%d"), '_', date_temp.strftime("%Y-%m-%d")])
-    print (date_temp.strftime("%Y-%m-%d"))
+    date_time = date_temp.strftime("%Y-%m-%d")
+    URL = ''.join([LSSC_URL, date_time, '_', date_time])
+    #print (date_time)
     page = urllib.request.urlopen(URL)
 
     soup = BeautifulSoup(page.read(),'html.parser')
@@ -30,10 +31,10 @@ while(date_temp < date_end):
     for i,l in enumerate(tablelist):
         pattern = re.compile(r'\d+')
         result_item = pattern.findall(str(l))
-        record = "{0}.{1}".format(str(i+1), str(result_item[0]))
-        print (record)
+        record = "{0} {1}.{2}".format(date_time, str(i+1), str(result_item[0]))
+        #print (record)
         result.append(record)
-    with open("..\\Data\\" + date_temp.strftime("%Y-%m-%d") + ".txt", 'w+') as filedata:
+    with open("..\\Data\\" + date_time + ".txt", 'w+') as filedata:
         for x in result:
             filedata.write(x)
             filedata.write('\n')

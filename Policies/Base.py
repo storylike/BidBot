@@ -34,7 +34,8 @@ class BasePolicy(object):
         URL = ''.join([LSSC_URL, date_today, '_', date_today])
         for i in range(Retries):
             try:
-                page = urllib.request.urlopen(URL)
+                self.logger("Start to open URL, retries = {}".format(str(i)))
+                page = urllib.request.urlopen(URL, timeout=40)
                 break
             except URLError:
                 self.logger("Failed to open URL, retries = {}".format(str(i)))
@@ -65,11 +66,12 @@ class BasePolicy(object):
         :param self:
         :return:
         """
+        sleeptime = 60
         self.logger("Trying to update today's data...")
         tempdata = self.CrawlAndBuildDataTable()
         while len(tempdata) == len(self.datatoday):
-            self.logger("Data identical to previous fetched, sleep 20 seconds and retry.")
-            time.sleep(30)
+            self.logger("Data identical to previous fetched, sleep {} seconds and retry.".format(sleeptime))
+            time.sleep(sleeptime)
             tempdata = self.CrawlAndBuildDataTable()
         assert len(tempdata) == len(self.datatoday) + 1, "Unexpected data length captured!"
         self.logger("New data record found: {}. Start updating data.".format(str(tempdata[-1])))
