@@ -10,15 +10,15 @@ import datetime
 sys.path.append('..')
 from config import LSSC_URL,LSSC_DATEFORMAT
 
-START_DATE = "2016-06-16"
-END_DATE = "2018-06-16"
+START_DATE = "2009-06-16"
+END_DATE = "2018-06-17"
 print(LSSC_URL)
 print(LSSC_DATEFORMAT)
 date_start = datetime.datetime.strptime(START_DATE, LSSC_DATEFORMAT)
 date_end = datetime.datetime.strptime(END_DATE, LSSC_DATEFORMAT)
 date_temp = date_start
 
-while(date_temp < date_end):
+while date_temp < date_end:
     date_time = date_temp.strftime("%Y-%m-%d")
     URL = ''.join([LSSC_URL, date_time, '_', date_time])
     #print (date_time)
@@ -40,3 +40,4 @@ while(date_temp < date_end):
             filedata.write('\n')
     page.close()
     date_temp = date_temp + datetime.timedelta(days=1)
+    #time.sleep(1)

@@ -7,3 +7,4 @@ config.py
 debug.log
 Log/*
 ghostdriver.log
+venv/*

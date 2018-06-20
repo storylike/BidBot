@@ -66,7 +66,7 @@ class BasePolicy(object):
         :param self:
         :return:
         """
-        sleeptime = 60
+        sleeptime = 30
         self.logger("Trying to update today's data...")
         tempdata = self.CrawlAndBuildDataTable()
         while len(tempdata) == len(self.datatoday):
@@ -118,6 +118,16 @@ class BasePolicy(object):
             name = self.name, \
             numlist = str(self.current_bid_list) \
             ))
+    def WaitForBidStart(self):
+        """
+        Wait for biding cycle starts: skipping period 2:00 - 10:00 everyday.
+        :param self:
+        :return:
+        """
+        cur_time = time.strftime('%H:%M:%S')
+        while (cur_time > '02:00:00') and (cur_time < '10:00:00'):
+            # I'm only focusing on time period of 10:00 - 22.00 every day, with drawing lottery interval being 10 minutes.
+            time.sleep(30)
 
 #    def GotoBidPage(self):
 #        pass

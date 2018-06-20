@@ -110,15 +110,34 @@ class YFFS(BasePolicy):
         predicted = self.biddict
         return predicted
 
+    def WaitForBidStart(self):
+        """
+        Wait for biding cycle starts: skipping period 2:00 - 10:00 everyday.
+        :param self:
+        :return:
+        """
+        cur_time = time.strftime('%H:%M:%S')
+        self.logger("WaitForBidStart...")
+        while (cur_time > '02:00:00') and (cur_time < '10:00:00'):
+            # I would only work after 10 AM :)
+            self.logger("    Wait 60 seconds...")
+            time.sleep(20)
+            self.driver.find_element_by_css_selector("a[class='btn b0'][data-bettype='1'][data-subid='2345']").click()
+            time.sleep(20)
+            self.driver.find_element_by_css_selector("a[class='btn b0'][data-bettype='10'][data-subid='45']").click()
+            time.sleep(20)
+
     def StartBid(self):
         """
         Start bidding.
         :param biddict:
         :return:
         """
+        # First, we need to wait for bid cycle start.
+        #self.WaitForBidStart()
         self.logger("Round:{} Policy: YFFS, StartBiding...". format(str(self.round)))
         self.logger(str(self.biddict))
-        time.sleep(40)
+        time.sleep(60)
         for key, value in self.biddict.items():
             if (value[0] < 20) and (value[0] != 0xff) and (value[0] in self.bidreferencetable) and (self.bidreferencetable[value[0]] > 0):
                 # Click WuXing
@@ -129,9 +148,8 @@ class YFFS(BasePolicy):
                 self.driver.find_element_by_css_selector("a[class='btn b0'][data-bettype='5'][data-subid='1123']").click()
                 time.sleep(2)
                 # WuXingYiMa BuDingWei
-                self.driver.find_element_by_css_selector(
-                    "input[name='r0'][type='radio'][class='pointer'][value='2_5_112345']").click()
-                time.sleep(1)
+                self.driver.find_element_by_css_selector("input[name='r0'][type='radio'][class='pointer'][value='2_5_112345']").click()
+                time.sleep(2)
                 # Select Bid Number, 5, e.g.
                 # driver.find_element_by_css_selector("a[data-num='5'][class='isNum']").click()
                 # We should apply actual bid num from biddict:

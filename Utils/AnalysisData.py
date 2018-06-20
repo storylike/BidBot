@@ -8,8 +8,8 @@ sys.path.append('..')
 from config import LSSC_DATEFORMAT
 
 
-START_DATE = "2016-06-16"
-END_DATE = "2018-06-15"
+START_DATE = "2009-12-13"
+END_DATE = "2018-06-16"
 
 date_start = datetime.datetime.strptime(START_DATE, LSSC_DATEFORMAT)
 date_end = datetime.datetime.strptime(END_DATE, LSSC_DATEFORMAT)

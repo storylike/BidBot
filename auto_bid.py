@@ -148,6 +148,10 @@ class BidRobot(object):
         self.driver.find_elements_by_class_name('product_01')[0].click()
         time.sleep(5)
 
+        if self.driver.find_elements_by_class_name('dont-popup')[0].is_displayed():
+            self.driver.find_elements_by_class_name('dont-popup')[0].click()
+            self.driver.find_elements_by_class_name('fa-close')[0].click()
+
     def SafeLogOut(self, driver):
         """
         This is safe logout method.
@@ -172,8 +176,26 @@ class BidRobot(object):
             # I'm only focusing on time period of 10:00 - 22.00 every day, with drawing lottery interval being 10 minutes.
             raise InvalidBidTime
 
-
-
+    def WaitForBidStart(self):
+        """
+        Wait for biding cycle starts: skipping period 2:00 - 10:00 everyday.
+        :param self:
+        :return:
+        """
+        cur_time = time.strftime('%H:%M:%S')
+        self.logger("Auto_bid: WaitForBidStart...")
+        while (cur_time > '02:00:00') and (cur_time < '09:55:00'):
+            # I would only work after 10 AM :)
+            self.logger("Auto_bid:    Wait 60 seconds...")
+            time.sleep(20)
+            self.driver.find_element_by_css_selector("a[class='btn b0'][href='#bet/betOrder']").click()
+            time.sleep(20)
+            self.driver.find_element_by_css_selector("a[class='btn b0'][href='#bet/betPapers']").click()
+            time.sleep(20)
+            cur_time = time.strftime('%H:%M:%S')
+        time.sleep(10)
+        self.driver.find_element_by_css_selector("a[class='btn b0'][href='#bet/lobby'][id='nowGP']").click()
+        time.sleep(10)
 
 def logger(log_string):
     """
@@ -187,8 +209,6 @@ def logger(log_string):
         log.write(' '.join([logtime, log_string, '\n']))
 
     print(' '.join([logtime, log_string, '\n']))
-
-
 
 if __name__ == '__main__':
     """
@@ -209,6 +229,8 @@ if __name__ == '__main__':
     Policy1.GetTodayData()
     Policy1.CreateBidDict()
 
+    Bot.WaitForBidStart()
+
     while True:
         try:
             # Reload main page
@@ -224,7 +246,7 @@ if __name__ == '__main__':
             Policy1.UpdateBidDict()
             # Start biding
             Policy1.StartBid()
-            time.sleep(random.randint(10,30))
+            time.sleep(random.randint(10,20))
 
             ##
             ## Policy 2 handling:
