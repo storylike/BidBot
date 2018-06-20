@@ -1,12 +1,10 @@
 import sys
 import time
-#sys.path.append('.')
 from .Base import BasePolicy
 from bs4 import BeautifulSoup
-from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.common.action_chains import ActionChains
 from selenium.webdriver.support.ui import Select
-
+#from selenium.webdriver.common.keys import Keys
 sys.path.append('..')
 from config import BID_UNIT_VALUE_MAP
 
@@ -26,14 +24,14 @@ class YFFS(BasePolicy):
         #                     19:20000, 20:40000
         #                     }
         # Stop losses at 17
-        self.bidreferencetable = {0:0, 1:0, 2:0, 3:1, 4:2, 5:4, 6:8, 7:16, 8:32, 9:64, \
-                             10:200, 11:400, 12:800, 13:1600, 14:3200, 15:6400, 16:12800, 17:25600, 18:0, \
-                             19:0, 20:0, 21:0, 22:0, 23:0, 24:0, 25:0, 26:0, 27:0, 28:0, 29:0, 30:0
-                             }
+        self.bidreferencetable = {0: 0, 1: 0, 2: 0, 3: 1, 4: 2, 5: 4, 6: 8, 7: 16, 8: 32, 9: 64,
+                                  10: 200, 11: 400, 12: 800, 13: 1600, 14: 3200, 15: 6400, 16: 12800, 17: 25600, 18: 0,
+                                  19: 0, 20: 0, 21: 0, 22: 0, 23: 0, 24: 0, 25: 0, 26: 0, 27: 0, 28: 0, 29: 0, 30: 0
+                                  }
         self.current_bid_list = []
         # biddict: {bidnum:[NotRecentlyOccurredRounds, LastBidCount]}
-        self.biddict = {0:[0xff,0], 1:[0xff,0], 2:[0xff,0], 3:[0xff,0], 4:[0xff,0], \
-                        5:[0xff,0], 6:[0xff,0], 7:[0xff,0], 8:[0xff,0], 9:[0xff,0] \
+        self.biddict = {0: [0xff, 0], 1: [0xff, 0], 2: [0xff, 0], 3: [0xff, 0], 4: [0xff, 0],
+                        5: [0xff, 0], 6: [0xff, 0], 7: [0xff, 0], 8: [0xff, 0], 9: [0xff, 0]
                         }
 
 
@@ -50,13 +48,13 @@ class YFFS(BasePolicy):
         for key,value in self.biddict.items():
             index = -1
             increment = 0
-            Found = True
+            found = True
             while str(key) not in self.datatoday[index-increment]:
                 increment = increment + 1
                 if increment >= 20 or increment + 1 > len(self.datatoday):
-                    Found = False
+                    found = False
                     break
-            if Found is True:
+            if found is True:
                 self.biddict[key][0] = increment
 
         self.logger("YFFS Policy: biddict:")
@@ -87,6 +85,7 @@ class YFFS(BasePolicy):
         :param driver:
         :return:
         """
+        historydata = []
         soup = BeautifulSoup.BeautifulSoup()
         return historydata
 
@@ -97,6 +96,7 @@ class YFFS(BasePolicy):
         :param driver:
         :return:
         """
+        historydata = []
         return historydata
 
     def Predict(self, data):
@@ -198,10 +198,10 @@ class YFFS(BasePolicy):
         End biding, clean up.
         :return:
         """
-        self.logger("Round {round} end, policy:{name}, bid number(s): {numlist}".format( \
-            round = self.round, \
-            name = self.name, \
-            numlist = str(self.current_bid_list) \
+        self.logger("Round {round} end, policy:{name}, bid number(s): {numlist}".format(
+            round=self.round,
+            name=self.name,
+            numlist=str(self.current_bid_list)
             ))
 
     def GotoBidPage(self):

@@ -2,16 +2,12 @@ import os
 from datetime import datetime, date, time
 from selenium import webdriver
 from selenium.webdriver import FirefoxOptions
-from selenium.webdriver.common.keys import Keys
-from selenium.webdriver.common.action_chains import ActionChains
-from selenium.webdriver.support.ui import Select
 from PIL import Image
-#from pytesser import pytesser
 import time
 import random
 from config import DATETIMEFMT, BID_URL, GL_ROOT, USER, PASSWORD, CHROME_DRIVER_PATH
 from Policies.YFFS import YFFS
-
+#from pytesser import pytesser
 
 
 class BidRobot(object):
@@ -75,6 +71,7 @@ class BidRobot(object):
         with open('Log\\log_' + date_today + '.txt', 'a+') as log:
             log.write(' '.join([logtime, logmsg, '\n']))
         print(' '.join([logtime, logmsg, '\n']))
+
     def handle_vcode(self, driver):
         """
         This method handles verification codes.
@@ -111,9 +108,7 @@ class BidRobot(object):
             imgvcode.save('vcodes\\' + str(vcode) + '.png')
         else:
             self.logger("Screenshot failed!")
-
         return vcode
-
 
     def login(self, driver, userid=USER, password=PASSWORD):
         """
@@ -209,6 +204,7 @@ def logger(log_string):
         log.write(' '.join([logtime, log_string, '\n']))
 
     print(' '.join([logtime, log_string, '\n']))
+
 
 if __name__ == '__main__':
     """
