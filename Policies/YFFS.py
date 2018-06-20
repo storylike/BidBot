@@ -137,7 +137,17 @@ class YFFS(BasePolicy):
         #self.WaitForBidStart()
         self.logger("Round:{} Policy: YFFS, StartBiding...". format(str(self.round)))
         self.logger(str(self.biddict))
-        time.sleep(60)
+
+        # set sleeping interval
+        cur_time = time.strftime('%H:%M:%S')
+        if (cur_time >= '10:00:00') and (cur_time < '22:00:00'):
+            sleeping = 60
+        elif (cur_time >= '22:00:00') and (cur_time < '23:59:00'):
+            sleeping = 40
+        elif (cur_time >= '00:00:00') and (cur_time < '02:00:00'):
+            sleeping = 40
+
+        time.sleep(sleeping)
         for key, value in self.biddict.items():
             if (value[0] < 20) and (value[0] != 0xff) and (value[0] in self.bidreferencetable) and (self.bidreferencetable[value[0]] > 0):
                 # Click WuXing

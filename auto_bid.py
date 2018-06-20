@@ -225,10 +225,11 @@ if __name__ == '__main__':
     Policy1.GetTodayData()
     Policy1.CreateBidDict()
 
-    Bot.WaitForBidStart()
-
     while True:
         try:
+            # First, we need to check bid time, bid not available during 2:00-10:00 everyday.
+            Bot.WaitForBidStart()
+
             # Reload main page
             #Bot.Refresh(driver)
             ##

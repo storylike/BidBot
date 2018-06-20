@@ -66,7 +66,14 @@ class BasePolicy(object):
         :param self:
         :return:
         """
-        sleeping = 60
+        # Set sleeping interval
+        cur_time = time.strftime('%H:%M:%S')
+        if (cur_time >= '10:00:00') and (cur_time < '22:00:00'):
+            sleeping = 60
+        elif (cur_time >= '22:00:00') and (cur_time < '23:59:00'):
+            sleeping = 30
+        elif (cur_time >= '00:00:00') and (cur_time < '02:00:00'):
+            sleeping = 30
         self.logger("Trying to update today's data...")
         temp_data = self.CrawlAndBuildDataTable()
         while len(temp_data) == len(self.datatoday):
@@ -93,7 +100,7 @@ class BasePolicy(object):
         :param list_raw:
         :return:
         """
-        result_temp = {0:0, 1:0, 2:0, 3:0, 4:0, 5:0, 6:0, 7:0, 8:0, 9:0}
+        result_temp = {0: 0, 1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0, 7: 0, 8: 0, 9: 0}
         self.logger("CountNumAndSort Start...")
         for items in list_raw:
             for x in items:
@@ -143,7 +150,7 @@ class BasePolicy(object):
         :return:
         """
         date_today = time.strftime('%Y-%m-%d')
-        logtime = time.strftime(DATETIMEFMT)
+        log_time = time.strftime(DATETIMEFMT)
         with open('Log\\log_' + date_today + '.txt', 'a+') as log:
-            log.write(' '.join([logtime, logmsg, '\n']))
-        print(' '.join([logtime, logmsg,'\n']))
+            log.write(' '.join([log_time, logmsg, '\n']))
+        print(' '.join([log_time, logmsg,'\n']))
