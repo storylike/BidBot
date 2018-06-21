@@ -14,7 +14,7 @@ class YFFS(BasePolicy):
         Init method.
         """
         super().__init__(driver)
-        self.name = 'BASE'
+        self.name = 'YFFS'
         self.driver = driver
         # Unit: FEN
         self.bidunit = BID_UNIT_VALUE_MAP["JIAO"]
@@ -24,8 +24,8 @@ class YFFS(BasePolicy):
         #                     19:20000, 20:40000
         #                     }
         # Stop losses at 17
-        self.bidreferencetable = {0: 0, 1: 0, 2: 0, 3: 1, 4: 2, 5: 4, 6: 8, 7: 16, 8: 32, 9: 64,
-                                  10: 200, 11: 400, 12: 800, 13: 1600, 14: 3200, 15: 6400, 16: 12800, 17: 25600, 18: 0,
+        self.bidreferencetable = {0: 0, 1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0, 7: 0, 8: 0, 9: 50,
+                                  10: 100, 11: 200, 12: 400, 13: 800, 14: 1600, 15: 3200, 16: 6400, 17: 12800, 18: 0,
                                   19: 0, 20: 0, 21: 0, 22: 0, 23: 0, 24: 0, 25: 0, 26: 0, 27: 0, 28: 0, 29: 0, 30: 0
                                   }
         self.current_bid_list = []
@@ -139,7 +139,7 @@ class YFFS(BasePolicy):
         self.logger(str(self.biddict))
 
         # set sleeping interval
-        sleeping = 40
+        sleeping = 20
         cur_time = time.strftime('%H:%M:%S')
         if (cur_time >= '10:00:00') and (cur_time < '22:00:00'):
             sleeping = 60

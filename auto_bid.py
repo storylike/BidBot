@@ -7,6 +7,7 @@ import time
 import random
 from config import DATETIMEFMT, BID_URL, GL_ROOT, USER, PASSWORD, CHROME_DRIVER_PATH
 from Policies.YFFS import YFFS
+from Policies.HEZXFS import HEZXFS
 #from pytesser import pytesser
 
 
@@ -224,9 +225,14 @@ if __name__ == '__main__':
 
     Bot = BidRobot(driver)
     Bot.login(driver, USER, PASSWORD)
-    Policy1 = YFFS(driver)
+    # Instantiate HEZXFS
+    Policy1 = HEZXFS(driver)
     Policy1.GetTodayData()
-    Policy1.CreateBidDict()
+
+    # Instantiate YFFS
+    Policy2 = YFFS(driver)
+    Policy2.GetTodayData()
+    Policy2.CreateBidDict()
 
     while True:
         try:
@@ -238,21 +244,25 @@ if __name__ == '__main__':
             ##
             ## Policy 1 handling:
             ##
-            # Goto biding page
             Policy1.GotoBidPage()
-            # Get last biding history
-
             Policy1.UpdateTodayData()
-            Policy1.UpdateBidDict()
-            # Start biding
             Policy1.StartBid()
-            time.sleep(random.randint(10, 12))
+            # Sleeping between biding policies
+            time.sleep(random.randint(10, 15))
 
             ##
             ## Policy 2 handling:
             ##
+            # Goto biding page
+            Policy2.GotoBidPage()
+            # Get last biding history
 
-            #time.sleep(random.randomint(1, 30))
+            Policy2.UpdateTodayData()
+            Policy2.UpdateBidDict()
+            # Start biding
+            Policy2.StartBid()
+            # Sleeping between biding policies
+            time.sleep(random.randint(10, 15))
 
             ##
             ## Policy 3 handling:

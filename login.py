@@ -4,7 +4,6 @@ from selenium.webdriver.common.action_chains import ActionChains
 from selenium.webdriver.support.ui import Select
 from PIL import Image
 from bs4 import BeautifulSoup
-#from pytesser import pytesser
 import time
 import os
 
@@ -113,4 +112,10 @@ driver.find_element_by_css_selector("a[class='btn b3'][id='gamebuy']").click()
 confirm_box = driver.find_elements_by_css_selector("button[type='button'][i-id='ok'][class='fix-ui-dialog-autofocus']")[-1]
 confirm_box.click()
 
+# er xing
+driver.find_element_by_css_selector("a[class='btn b0'][data-bettype='1'][data-subid='12']").click()
+
+# houerzhixuanfushi
+driver.find_element_by_css_selector("input[name='r0'][type='radio'][class='pointer'][value='2_1_45']").click()
+driver.find_elements_by_css_selector("a[href='javascript:;'][data-num='2']")[0].click()
 

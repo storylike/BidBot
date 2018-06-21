@@ -21,7 +21,7 @@ class BasePolicy(object):
         self.driver = driver
         self.current_bid_list = []
         self.datatoday = []
-        self.lenghao_sorted = {0: 0, 1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0, 7: 0, 8: 0, 9: 0}
+        self.lenghao_sorted = {}
 
     def CrawlAndBuildDataTable(self):
         """
@@ -77,7 +77,8 @@ class BasePolicy(object):
             self.logger("Data identical to previous fetched, sleep {} seconds and retry.".format(sleeping))
             time.sleep(sleeping)
             temp_data = self.CrawlAndBuildDataTable()
-        assert len(temp_data) == len(self.datatoday) + 1, "Unexpected data length captured!"
+        # Cancel this assert in case of midnight :)
+        #assert len(temp_data) == len(self.datatoday) + 1, "Unexpected data length captured!"
         self.logger("New data record found: {}. Start updating data.".format(str(temp_data[-1])))
         #for index, items in enumerate(temp_data):
         #    assert self.datatoday[index] == items, \
@@ -97,12 +98,12 @@ class BasePolicy(object):
         :param list_raw:
         :return:
         """
-        result_temp = {0: 0, 1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0, 7: 0, 8: 0, 9: 0}
+        result_temp = {'0': 0, '1': 0, '2': 0, '3': 0, '4': 0, '5': 0, '6': 0, '7': 0, '8': 0, '9': 0}
         self.logger("CountNumAndSort Start...")
         for items in list_raw:
             for x in items:
-                result_temp[int(x)] = result_temp[int(x)] + 1
-        result = sorted(result_temp.items(), key=lambda d: d[1], reverse = False)
+                result_temp[x] = result_temp[x] + 1
+        result = sorted(result_temp.items(), key=lambda d: d[1], reverse=False)
         self.logger("Generated lenghao list: {0}".format(result))
         return result
 

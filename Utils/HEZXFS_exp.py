@@ -8,7 +8,7 @@ sys.path.append('..')
 from config import LSSC_DATEFORMAT
 
 
-START_DATE = "2017-12-16"
+START_DATE = "2017-06-16"
 END_DATE = "2018-06-16"
 
 date_start = datetime.datetime.strptime(START_DATE, LSSC_DATEFORMAT)
@@ -79,7 +79,14 @@ if __name__ == '__main__':
             final["hit"] = 0
         date_temp = date_temp + datetime.timedelta(days=1)
 
+    earn_list.append(-10)
+    earn_list.append(-100)
+    earn_list.append(-200)
+    earn_list.append(-400)
+    earn_list.append(-1000)
+
     time_line = list(range(len(earn_list)))
+
     plt.bar(time_line, earn_list, 0.5)
     #plt.set_xticks(range(len(ratio_list)))
     #plt.set_xticklabels(ratio_list)
