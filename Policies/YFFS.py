@@ -139,13 +139,10 @@ class YFFS(BasePolicy):
         self.logger(str(self.biddict))
 
         # set sleeping interval
+        sleeping = 40
         cur_time = time.strftime('%H:%M:%S')
         if (cur_time >= '10:00:00') and (cur_time < '22:00:00'):
             sleeping = 60
-        elif (cur_time >= '22:00:00') and (cur_time < '23:59:00'):
-            sleeping = 40
-        elif (cur_time >= '00:00:00') and (cur_time < '02:00:00'):
-            sleeping = 40
 
         time.sleep(sleeping)
         for key, value in self.biddict.items():

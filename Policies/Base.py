@@ -68,12 +68,9 @@ class BasePolicy(object):
         """
         # Set sleeping interval
         cur_time = time.strftime('%H:%M:%S')
+        sleeping = 30
         if (cur_time >= '10:00:00') and (cur_time < '22:00:00'):
             sleeping = 60
-        elif (cur_time >= '22:00:00') and (cur_time < '23:59:00'):
-            sleeping = 30
-        elif (cur_time >= '00:00:00') and (cur_time < '02:00:00'):
-            sleeping = 30
         self.logger("Trying to update today's data...")
         temp_data = self.CrawlAndBuildDataTable()
         while len(temp_data) == len(self.datatoday):

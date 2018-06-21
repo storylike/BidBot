@@ -178,8 +178,9 @@ class BidRobot(object):
         :return:
         """
         cur_time = time.strftime('%H:%M:%S')
+        need_click = False
         self.logger("Auto_bid: WaitForBidStart...")
-        while (cur_time > '02:00:00') and (cur_time < '09:55:00'):
+        while (cur_time > '02:00:00') and (cur_time < '09:59:59'):
             # I would only work after 10 AM :)
             self.logger("Auto_bid:    Wait 60 seconds...")
             time.sleep(20)
@@ -188,9 +189,11 @@ class BidRobot(object):
             self.driver.find_element_by_css_selector("a[class='btn b0'][href='#bet/betPapers']").click()
             time.sleep(20)
             cur_time = time.strftime('%H:%M:%S')
-        time.sleep(10)
-        self.driver.find_element_by_css_selector("a[class='btn b0'][href='#bet/lobby'][id='nowGP']").click()
-        time.sleep(10)
+            need_click = True
+        if need_click:
+            time.sleep(30)
+            self.driver.find_element_by_css_selector("a[class='btn b0'][id='nowGP']").click()
+            time.sleep(5)
 
 def logger(log_string):
     """
@@ -243,7 +246,7 @@ if __name__ == '__main__':
             Policy1.UpdateBidDict()
             # Start biding
             Policy1.StartBid()
-            time.sleep(random.randint(10,20))
+            time.sleep(random.randint(10, 12))
 
             ##
             ## Policy 2 handling:
