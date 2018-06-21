@@ -181,7 +181,7 @@ class BidRobot(object):
         cur_time = time.strftime('%H:%M:%S')
         need_click = False
         self.logger("Auto_bid: WaitForBidStart...")
-        while (cur_time > '02:00:00') and (cur_time < '09:59:59'):
+        while (cur_time > '02:00:00') and (cur_time < '10:00:00'):
             # I would only work after 10 AM :)
             self.logger("Auto_bid:    Wait 60 seconds...")
             time.sleep(20)
@@ -245,8 +245,8 @@ if __name__ == '__main__':
             ## Policy 1 handling:
             ##
             Policy1.GotoBidPage()
-            Policy1.UpdateTodayData()
-            Policy1.StartBid()
+            if Policy1.UpdateTodayData():
+                Policy1.StartBid()
             # Sleeping between biding policies
             time.sleep(random.randint(10, 15))
 
@@ -257,8 +257,8 @@ if __name__ == '__main__':
             Policy2.GotoBidPage()
             # Get last biding history
 
-            Policy2.UpdateTodayData()
-            Policy2.UpdateBidDict()
+            if Policy2.UpdateTodayData():
+                Policy2.UpdateBidDict()
             # Start biding
             Policy2.StartBid()
             # Sleeping between biding policies

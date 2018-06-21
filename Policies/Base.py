@@ -66,6 +66,7 @@ class BasePolicy(object):
         :param self:
         :return:
         """
+        max_retry_count = 30
         # Set sleeping interval
         cur_time = time.strftime('%H:%M:%S')
         sleeping = 30
@@ -73,10 +74,14 @@ class BasePolicy(object):
             sleeping = 60
         self.logger("Trying to update today's data...")
         temp_data = self.CrawlAndBuildDataTable()
+        retry = 0
         while len(temp_data) == len(self.datatoday):
             self.logger("Data identical to previous fetched, sleep {} seconds and retry.".format(sleeping))
             time.sleep(sleeping)
             temp_data = self.CrawlAndBuildDataTable()
+            retry = retry + 1
+            if retry >= max_retry_count:
+                return False
         # Cancel this assert in case of midnight :)
         #assert len(temp_data) == len(self.datatoday) + 1, "Unexpected data length captured!"
         self.logger("New data record found: {}. Start updating data.".format(str(temp_data[-1])))
@@ -90,6 +95,7 @@ class BasePolicy(object):
             self.logger("      {:0>3}.  {}".format(str(index+1), items))
         self.lenghao_sorted = self.CountNumAndSort(self.datatoday)
         self.updated = True
+        return True
 
     def CountNumAndSort(self, list_raw):
         """
