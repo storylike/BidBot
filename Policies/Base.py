@@ -102,7 +102,7 @@ class BasePolicy(object):
         for items in list_raw:
             for x in items:
                 result_temp[int(x)] = result_temp[int(x)] + 1
-        result = sorted(result_temp.items(), key=lambda d:d[1], reverse = False)
+        result = sorted(result_temp.items(), key=lambda d: d[1], reverse = False)
         self.logger("Generated lenghao list: {0}".format(result))
         return result
 
