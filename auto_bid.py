@@ -183,12 +183,12 @@ class BidRobot(object):
         self.logger("Auto_bid: WaitForBidStart...")
         while (cur_time > '02:00:00') and (cur_time < '10:00:00'):
             # I would only work after 10 AM :)
-            self.logger("Auto_bid:    Wait 60 seconds...")
-            time.sleep(20)
+            self.logger("Auto_bid:    Wait 120 seconds...")
+            time.sleep(30)
             self.driver.find_element_by_css_selector("a[class='btn b0'][href='#bet/betOrder']").click()
-            time.sleep(20)
+            time.sleep(60)
             self.driver.find_element_by_css_selector("a[class='btn b0'][href='#bet/betPapers']").click()
-            time.sleep(20)
+            time.sleep(30)
             cur_time = time.strftime('%H:%M:%S')
             need_click = True
         if need_click:
@@ -253,17 +253,18 @@ if __name__ == '__main__':
             ##
             ## Policy 2 handling:
             ##
+            '''
             # Goto biding page
             Policy2.GotoBidPage()
             # Get last biding history
 
             if Policy2.UpdateTodayData():
                 Policy2.UpdateBidDict()
-            # Start biding
-            Policy2.StartBid()
+                # Start biding
+                Policy2.StartBid()
             # Sleeping between biding policies
             time.sleep(random.randint(10, 15))
-
+            '''
             ##
             ## Policy 3 handling:
             ##

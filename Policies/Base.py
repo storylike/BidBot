@@ -28,7 +28,7 @@ class BasePolicy(object):
         This method crawls desired page, then build and store data we desire.
         :return:
         """
-        retries = 3
+        retries = 6
         self.logger("Start Crawling today's LSSC data...")
         date_today = datetime.datetime.now().strftime(LSSC_DATEFORMAT)
         URL = ''.join([LSSC_URL, date_today, '_', date_today])
@@ -39,6 +39,8 @@ class BasePolicy(object):
                 break
             except URLError:
                 self.logger("Failed to open URL, retries = {}".format(str(i)))
+            else:
+                self.logger("Unknown error, retries = {}".format(str(i)))
             time.sleep(15)
         content = page.read()
         soup = BeautifulSoup(content, 'html.parser')
