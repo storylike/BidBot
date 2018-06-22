@@ -8,8 +8,8 @@ sys.path.append('..')
 from config import LSSC_DATEFORMAT
 
 
-START_DATE = "2017-06-16"
-END_DATE = "2018-06-16"
+START_DATE = "2018-06-22"
+END_DATE = "2018-06-22"
 
 date_start = datetime.datetime.strptime(START_DATE, LSSC_DATEFORMAT)
 date_end = datetime.datetime.strptime(END_DATE, LSSC_DATEFORMAT)
@@ -34,8 +34,10 @@ def CountNumAndSort(list_raw):
     :return:
     """
     global result_dict
-    for x in list_raw:
-        result_dict[x] = result_dict[x] + 1
+    clearresult()
+    for items in list_raw:
+        for x in items:
+            result_dict[x] = result_dict[x] + 1
     result = sorted(result_dict.items(), key=lambda d: d[1], reverse=False)
     return result
 
@@ -58,7 +60,7 @@ if __name__ == '__main__':
                 line_list.append(line_record)
                 #print(line_list)
                 #print("第{}期：".format(line.split(' ')[1].split('.')[0]))
-                lenghao = CountNumAndSort(line_record)
+                lenghao = CountNumAndSort(line_list)
                 #print("    冷号：" + str(lenghao))
                 #print("    开出: {}".format(line.split('.')[1].strip()))
                 if int(line.split(' ')[1].split('.')[0]) > 24:
@@ -73,17 +75,28 @@ if __name__ == '__main__':
                     lenghao_last.append(lenghao[0][1])
 
                 line = record.readline().strip()
-            earn_list.append(31 * final["hit"] - 64 * final["miss"])
-            print("{0} {1}".format(date_temp.strftime("%Y-%m-%d"), str(final)))
+            net_earn = 31 * final["hit"] - 64 * final["miss"]
+            earn_list.append(net_earn)
+            if net_earn < 0:
+                print("================================================================================\
+                ===========================================================================================")
+            print("{0} {1} Earn: {2}".format(date_temp.strftime("%Y-%m-%d"), str(final), str(net_earn)))
+            print(sorted(result_dict.items(), key=lambda d: d[1], reverse=False))
             final["miss"] = 0
             final["hit"] = 0
         date_temp = date_temp + datetime.timedelta(days=1)
 
-    earn_list.append(-10)
-    earn_list.append(-100)
-    earn_list.append(-200)
-    earn_list.append(-400)
-    earn_list.append(-1000)
+    total_earn = 0
+    for earn in earn_list:
+        total_earn = total_earn + earn
+
+    print("Total Earn: {0}".format(str(total_earn)))
+
+    #earn_list.insert(0, -10)
+    #earn_list.insert(0, -100)
+    #earn_list.insert(0, -200)
+    #earn_list.insert(0, -400)
+    #earn_list.insert(0, -1000)
 
     time_line = list(range(len(earn_list)))
 
