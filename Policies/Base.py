@@ -44,13 +44,13 @@ class BasePolicy(object):
             time.sleep(15)
         content = page.read()
         soup = BeautifulSoup(content, 'html.parser')
-        tablelist = soup.findAll("td", attrs={"class":"red big"})
+        tablelist = soup.findAll("td", attrs={"class": "red big"})
         result = []
         for l in tablelist:
             pattern = re.compile(r'\d+')
             result_item = pattern.findall(str(l))
             result.append(list(str(result_item[0])))
-        for index,items in enumerate(result):
+        for index, items in enumerate(result):
             self.logger("      {:0>3}.  {}".format(str(index+1), items))
         page.close()
         return result
@@ -86,7 +86,8 @@ class BasePolicy(object):
                 return False
         # Cancel this assert in case of midnight :)
         #assert len(temp_data) == len(self.datatoday) + 1, "Unexpected data length captured!"
-        self.logger("New data record found: {}. Start updating data.".format(str(temp_data[-1])))
+        if len(temp_data) > 0:
+            self.logger("New data record found: {}. Start updating data.".format(str(temp_data[-1])))
         #for index, items in enumerate(temp_data):
         #    assert self.datatoday[index] == items, \
         #        "datatoday[{0}]={1}, temp_data[{0}]={2}".format(str(index), str(self.datatoday[index]), str(items))
