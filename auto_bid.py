@@ -235,50 +235,43 @@ if __name__ == '__main__':
     Policy2.CreateBidDict()
 
     while True:
-        try:
-            # First, we need to check bid time, bid not available during 2:00-10:00 everyday.
-            Bot.WaitForBidStart()
-
-            # Reload main page
-            #Bot.Refresh(driver)
-            ##
-            ## Policy 1 handling:
-            ##
-            Policy1.GotoBidPage()
-            if Policy1.UpdateTodayData():
-                Policy1.StartBid()
-            # Sleeping between biding policies
-            time.sleep(random.randint(10, 15))
-
-            ##
-            ## Policy 2 handling:
-            ##
-            '''
-            # Goto biding page
-            Policy2.GotoBidPage()
-            # Get last biding history
-
-            if Policy2.UpdateTodayData():
-                Policy2.UpdateBidDict()
-                # Start biding
-                Policy2.StartBid()
-            # Sleeping between biding policies
-            time.sleep(random.randint(10, 15))
-            '''
-            ##
-            ## Policy 3 handling:
-            ##
-
-
-            #time.sleep(random.randomint(10, 30))
-
-
-
-            # Waiting for next available biding time window
-            #Bot.WaitForNextBidCycle(driver)
-        except exceptions:
+        # First, we need to check bid time, bid not available during 2:00-10:00 everyday.
+        Bot.WaitForBidStart()
+        # Reload main page
+        #Bot.Refresh(driver)
+        ##
+        ## Policy 1 handling:
+        ##
+        '''
+        Policy1.GotoBidPage()
+        if Policy1.UpdateTodayData():
+            Policy1.StartBid()
+        # Sleeping between biding policies
+        time.sleep(random.randint(10, 15))
+        '''
+        ##
+        ## Policy 2 handling:
+        ##
+        # Goto biding page
+        Policy2.GotoBidPage()
+        # Get last biding history
+        if Policy2.UpdateTodayData():
+            Policy2.UpdateBidDict()
+            # Start biding
+            Policy2.StartBid()
+        # Sleeping between biding policies
+        time.sleep(random.randint(10, 15))
+        ##
+        ## Policy 3 handling:
+        ##
+        #time.sleep(random.randomint(10, 30))
+        # Waiting for next available biding time window
+        #Bot.WaitForNextBidCycle(driver)
+        '''
+        except:
             logger("Main loop break, because of exceptions")
             exit()
+        '''
 
     """
         except exceptions.KeyboardInterrupt:
