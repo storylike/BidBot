@@ -67,7 +67,7 @@ class HEZXFS(BasePolicy):
         # Select Bid Number, 5, e.g.
         # driver.find_element_by_css_selector("a[data-num='5'][class='isNum']").click()
         # exclude bid two numbers directly from lenghao_sorted[0][0] and lenghao_sorted[1][0]:
-        for x in set([0, 1, 2, 3, 4, 5, 6, 7, 8, 9]) - set([int(self.lenghao_sorted[0][0]), int(self.lenghao_sorted[1][0])]):
+        for x in set([int(self.lenghao_sorted[0][0]), int(self.lenghao_sorted[1][0])]):
             print("    Trying to select: {0}".format(str(x)))
             need_select = self.driver.find_elements_by_css_selector("a[href='javascript:;'][data-num={0}]".format(
                 ''.join(["\'", str(x), "\'"])))

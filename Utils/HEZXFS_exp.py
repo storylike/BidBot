@@ -4,9 +4,9 @@ import time
 import re
 import matplotlib.pyplot as plt
 import datetime
+
 sys.path.append('..')
 from config import LSSC_DATEFORMAT
-
 
 START_DATE = "2018-06-22"
 END_DATE = "2018-06-22"
@@ -15,17 +15,16 @@ date_start = datetime.datetime.strptime(START_DATE, LSSC_DATEFORMAT)
 date_end = datetime.datetime.strptime(END_DATE, LSSC_DATEFORMAT)
 date_temp = date_start
 
-
 temp_dict = {0: 0xc0, 1: 0xc0, 2: 0xc0, 3: 0xc0, 4: 0xc0, 5: 0xc0, 6: 0xc0, 7: 0xc0, 8: 0xc0, 9: 0xc0}
-
 
 result_dict = {'0': 0, '1': 0, '2': 0, '3': 0, '4': 0, '5': 0, '6': 0, '7': 0, '8': 0, '9': 0}
 
 
 def clearresult():
     global result_dict
-    for k,v in result_dict.items():
+    for k, v in result_dict.items():
         result_dict[k] = 0
+
 
 def CountNumAndSort(list_raw):
     """
@@ -44,42 +43,44 @@ def CountNumAndSort(list_raw):
 
 if __name__ == '__main__':
     earn_list = []
-    #global date_start, date_end, result_dict
+    # global date_start, date_end, result_dict
     while date_temp <= date_end:
         final = {"miss": 0, "hit": 0}
         with open("..\\Data\\" + date_temp.strftime("%Y-%m-%d") + '.txt', 'r') as record:
-            line = record.readline().strip()
-            clearresult()
-            lenghao_last = []
             line_list = []
-            while line:
-                #print(line)
-                #print(line_list)
-                #print(list(line.split('.')[1].strip()))
-                line_record = list(line.split('.')[1].strip())
-                line_list.append(line_record)
-                #print(line_list)
-                #print("第{}期：".format(line.split(' ')[1].split('.')[0]))
-                lenghao = CountNumAndSort(line_list)
-                #print("    冷号：" + str(lenghao))
-                #print("    开出: {}".format(line.split('.')[1].strip()))
-                if int(line.split(' ')[1].split('.')[0]) > 24:
-                    if set(lenghao_last) & set([list(line)[-1], list(line)[-2]]):
-                        final["miss"] = final["miss"] + 1
-                        #print("    miss")
-                    else:
-                        final["hit"] = final["hit"] + 1
-                        #print("    hit")
-                    lenghao_last = []
-                    lenghao_last.append(lenghao[0][0])
-                    lenghao_last.append(lenghao[0][1])
+            lenghao_last = []
+            clearresult()
+            print(result_dict)
+            next_run = True
 
-                line = record.readline().strip()
-            net_earn = 31 * final["hit"] - 64 * final["miss"]
+            for line in record.readlines():
+                if line:
+                    line_record = list(line.split('.')[1].strip())
+                    line_list.append(line_record)
+
+            if len(line_list) > 0:
+                for index, item in enumerate(line_list, 0):
+                    if index >= 24:
+                        lenghao = CountNumAndSort(line_list[0:index])
+                        lenghao_last.append(lenghao[-1][0])
+                        lenghao_last.append(lenghao[-2][0])
+                        if set(lenghao_last) & set([line_list[index][-1], line_list[index][-2]]):
+                            final["hit"] = final["hit"] + 1
+                            print("{0}:hit 热号:{1}".format(str(index+1), str(lenghao_last)))
+                            # print("    miss")
+                        else:
+                            final["miss"] = final["miss"] + 1
+                            print("{0}:miss 热号:{1}".format(str(index+1), str(lenghao_last)))
+                            # print("    hit")
+                    lenghao_last = []
+
+            net_earn = 91 * final["hit"] - 4 * final["miss"]
             earn_list.append(net_earn)
             if net_earn < 0:
+                '''
                 print("================================================================================\
                 ===========================================================================================")
+                '''
             print("{0} {1} Earn: {2}".format(date_temp.strftime("%Y-%m-%d"), str(final), str(net_earn)))
             print(sorted(result_dict.items(), key=lambda d: d[1], reverse=False))
             final["miss"] = 0
@@ -92,15 +93,15 @@ if __name__ == '__main__':
 
     print("Total Earn: {0}".format(str(total_earn)))
 
-    #earn_list.insert(0, -10)
-    #earn_list.insert(0, -100)
-    #earn_list.insert(0, -200)
-    #earn_list.insert(0, -400)
-    #earn_list.insert(0, -1000)
+    # earn_list.insert(0, -10)
+    # earn_list.insert(0, -100)
+    # earn_list.insert(0, -200)
+    # earn_list.insert(0, -400)
+    # earn_list.insert(0, -1000)
 
     time_line = list(range(len(earn_list)))
 
     plt.bar(time_line, earn_list, 0.5)
-    #plt.set_xticks(range(len(ratio_list)))
-    #plt.set_xticklabels(ratio_list)
+    # plt.set_xticks(range(len(ratio_list)))
+    # plt.set_xticklabels(ratio_list)
     plt.show()
