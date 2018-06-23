@@ -1,6 +1,5 @@
 import time
 import re
-import urllib
 import urllib.request
 from bs4 import BeautifulSoup
 import datetime
@@ -9,6 +8,15 @@ sys.path.append('..')
 from config import LSSC_URL, LSSC_DATEFORMAT, DATETIMEFMT
 from urllib.error import URLError
 
+request_headers = {
+    'host': "chart.cp.360.cn",
+    'connection': "keep-alive",
+    'cache-control': "no-cache",
+    'upgrade-insecure-requests': "1",
+    'user-agent': "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_2) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/55.0.2883.95 Safari/537.36",
+    'accept': "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8",
+    'accept-language': "zh-CN,en-US;q=0.8,en;q=0.6"
+}
 
 class BasePolicy(object):
     """
@@ -29,21 +37,31 @@ class BasePolicy(object):
         This method crawls desired page, then build and store data we desire.
         :return:
         """
-        retries = 6
+        max_retry = 4
         self.logger("Start Crawling today's LSSC data...")
         date_today = datetime.datetime.now().strftime(LSSC_DATEFORMAT)
-        URL = ''.join([LSSC_URL, date_today, '_', date_today])
-        for i in range(retries):
+        url = ''.join([LSSC_URL, date_today, '_', date_today])
+        retry = 0
+        sleeping = 10
+        while retry < max_retry:
             try:
-                self.logger("Start to open URL, retries = {}".format(str(i)))
-                page = urllib.request.urlopen(URL, timeout=40)
+                self.logger("Start to open URL, retries = {}".format(str(retry)))
+                req = urllib.request.Request(url, headers=request_headers)
+                page = urllib.request.urlopen(req, timeout=40)
                 break
-            except URLError:
-                self.logger("Failed to open URL, retries = {}".format(str(i)))
+            except URLError as reason:
+                self.logger("Failed to open URL, {0}, retries = {1}".format(str(reason), str(retry)))
+                sleeping = sleeping + 10
+            except ConnectionResetError as reason:
+                self.logger("Connection Reset by peer, {0}, retries = {1}".format(str(reason), str(retry)))
+                sleeping = sleeping * 2
             else:
-                self.logger("Unknown error, retries = {}".format(str(i)))
-            time.sleep(15)
+                self.logger("Unknown error, retries = {}".format(str(retry)))
+                sleeping = sleeping + 10
+            time.sleep(sleeping)
+            retry += 1
         content = page.read()
+        page.close()
         soup = BeautifulSoup(content, 'html.parser')
         tablelist = soup.findAll("td", attrs={"class": "red big"})
         result = []
@@ -53,7 +71,6 @@ class BasePolicy(object):
             result.append(list(str(result_item[0])))
         for index, items in enumerate(result):
             self.logger("      {:0>3}.  {}".format(str(index+1), items))
-        page.close()
         return result
 
     def GetTodayData(self):
