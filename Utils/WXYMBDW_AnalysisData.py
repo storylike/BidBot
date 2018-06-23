@@ -8,7 +8,7 @@ import datetime
 sys.path.append('..')
 from config import LSSC_DATEFORMAT
 
-START_DATE = "2018-01-22"
+START_DATE = "2018-04-22"
 END_DATE = "2018-06-22"
 
 date_start = datetime.datetime.strptime(START_DATE, LSSC_DATEFORMAT)
@@ -67,7 +67,7 @@ if __name__ == '__main__':
     earn_list = []
     # global date_start, date_end, result_dict
     while date_temp <= date_end:
-        final = {"miss": 0, "hit": 0}
+        final = {"miss": 0, "hit": 0,  "half_hit": 0}
         with open("..\\Data\\" + date_temp.strftime("%Y-%m-%d") + '.txt', 'r') as record:
             line_list = []
             lenghao_last = []
@@ -92,22 +92,22 @@ if __name__ == '__main__':
                         rehao = CountRehaoAndSort(line_list[0:index])
                         rehao_list.append(rehao[0][0])
                         #rehao_list.append(rehao[1][0])
-                        if int(rehao[0][1]) >= 3:
-                            bid_run = True
-                        if set(rehao_list) & set(line_list[index]):
-                            if bid_run:
+                        if int(rehao[1][1]) >= 3:
+                            if len(set(rehao_list) & set(line_list[index])) == 2:
                                 final["hit"] = final["hit"] + 1
                                 print("{0}:hit 热号:{1}, 开:{2}".format(str(index+1), str(rehao[0][0]+':'+str(rehao[0][1])+'次'), line_list[index]))
                                 # print("    miss")
-                        else:
-                            if bid_run:
+                            elif len(set(rehao_list) & set(line_list[index])) == 1:
+                                final["half_hit"] = final["half_hit"] + 1
+                                print("{0}:half_hit 热号:{1}, 开:{2}".format(str(index+1), str(rehao[0][0]+':'+str(rehao[0][1])+'次'), line_list[index]))
+                                # print("    hit")
+                            else:
                                 final["miss"] = final["miss"] + 1
                                 print("{0}:miss 热号:{1}, 开:{2}".format(str(index+1), str(rehao[0][0]+':'+str(rehao[0][1])+'次'), line_list[index]))
-                                # print("    hit")
                     lenghao_last = []
                     rehao_list = []
 
-            net_earn = 36.38 * final["hit"] - 10 * final["miss"]
+            net_earn = 2.638 * final["hit"] + 0.319 * final["half_hit"] - 2 * final["miss"]
             earn_list.append(net_earn)
             if net_earn < 0:
                 '''

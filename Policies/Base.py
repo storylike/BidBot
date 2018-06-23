@@ -22,6 +22,7 @@ class BasePolicy(object):
         self.current_bid_list = []
         self.datatoday = []
         self.lenghao_sorted = {}
+        self.rehao_sorted = {}
 
     def CrawlAndBuildDataTable(self):
         """
@@ -97,6 +98,7 @@ class BasePolicy(object):
             self.logger("In UpdateTodayData, Datatoday:")
             self.logger("      {:0>3}.  {}".format(str(index+1), items))
         self.lenghao_sorted = self.CountNumAndSort(self.datatoday)
+        self.rehao_sorted = self.CountRehaoAndSort(self.datatoday)
         self.updated = True
         return True
 
@@ -112,8 +114,25 @@ class BasePolicy(object):
         for items in list_raw:
             for x in items:
                 result_temp[x] = result_temp[x] + 1
-        result = sorted(result_temp.items(), key=lambda d: d[1], reverse=True)
+        result = sorted(result_temp.items(), key=lambda d: d[1], reverse=False)
         self.logger("Generated lenghao list: {0}".format(result))
+        return result
+
+    def CountRehaoAndSort(self, list_raw):
+        """
+        Count numbers from today's database and generate a sorted rehao list.
+        Note, count recently continuously occurred times, instead of whole occurrence of this day.
+        :param list_raw:
+        :return:
+        """
+        rehao_temp = {'0': 0, '1': 0, '2': 0, '3': 0, '4': 0, '5': 0, '6': 0, '7': 0, '8': 0, '9': 0}
+        for items in list_raw:
+            for k, v in rehao_temp.items():
+                if k in items:
+                    rehao_temp[k] = rehao_temp[k] + 1
+                else:
+                    rehao_temp[k] = 0
+        result = sorted(rehao_temp.items(), key=lambda d: d[1], reverse=True)
         return result
 
     def Predict(self):

@@ -8,7 +8,7 @@ import datetime
 sys.path.append('..')
 from config import LSSC_DATEFORMAT
 
-START_DATE = "2018-06-22"
+START_DATE = "2018-01-22"
 END_DATE = "2018-06-22"
 
 date_start = datetime.datetime.strptime(START_DATE, LSSC_DATEFORMAT)
@@ -74,7 +74,7 @@ if __name__ == '__main__':
                             # print("    hit")
                     lenghao_last = []
 
-            net_earn = 91 * final["hit"] - 4 * final["miss"]
+            net_earn = 59 * final["hit"] - 36 * final["miss"]
             earn_list.append(net_earn)
             if net_earn < 0:
                 '''
