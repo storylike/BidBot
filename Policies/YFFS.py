@@ -119,7 +119,7 @@ class YFFS(BasePolicy):
         """
         cur_time = time.strftime('%H:%M:%S')
         self.logger("WaitForBidStart...")
-        while (cur_time > '02:00:00') and (cur_time < '10:00:00'):
+        while (cur_time > '02:00:00') and (cur_time < '10:12:00'):
             # I would only work after 10 AM :)
             self.logger("    Wait 60 seconds...")
             time.sleep(20)
