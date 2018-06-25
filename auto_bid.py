@@ -258,7 +258,7 @@ if __name__ == '__main__':
         ## Policy 2 handling:
         ##
         # Goto biding page
-        '''
+
         Policy2.GotoBidPage()
         # Get last biding history
         if Policy2.UpdateTodayData():
@@ -267,17 +267,18 @@ if __name__ == '__main__':
             Policy2.StartBid()
         # Sleeping between biding policies
         time.sleep(random.randint(10, 15))
-        '''
+
 
         ##
         ## Policy 3 handling:
         ##
+        '''
         Policy3.GotoBidPage()
         if Policy3.UpdateTodayData():
             Policy3.StartBid()
         # Sleeping between biding policies
         time.sleep(random.randint(10, 15))
-
+        '''
 
         #time.sleep(random.randomint(10, 30))
         # Waiting for next available biding time window

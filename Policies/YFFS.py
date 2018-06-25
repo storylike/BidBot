@@ -24,8 +24,8 @@ class YFFS(BasePolicy):
         #                     19:20000, 20:40000
         #                     }
         # Stop losses at 17
-        self.bidreferencetable = {0: 0, 1: 0, 2: 0, 3: 0, 4: 1, 5: 3, 6: 6, 7: 12, 8: 25, 9: 50,
-                                  10: 100, 11: 200, 12: 400, 13: 800, 14: 1600, 15: 3200, 16: 6400, 17: 12800, 18: 0,
+        self.bidreferencetable = {0: 0, 1: 0, 2: 0, 3: 1, 4: 2, 5: 4, 6: 8, 7: 16, 8: 32, 9: 64,
+                                  10: 200, 11: 400, 12: 800, 13: 1600, 14: 3200, 15: 6400, 16: 12800, 17: 25600, 18: 0,
                                   19: 0, 20: 0, 21: 0, 22: 0, 23: 0, 24: 0, 25: 0, 26: 0, 27: 0, 28: 0, 29: 0, 30: 0
                                   }
         self.current_bid_list = []
@@ -68,16 +68,17 @@ class YFFS(BasePolicy):
         :return:
         """
         self.logger("In UpdateBidDict")
-        self.logger("datatoday[-1] = {}".format(str(self.datatoday[-1])))
-        self.logger("Before BidDict Update:")
-        self.logger("    BidDict: {}".format(str(self.biddict)))
-        for key, value in self.biddict.items():
-            if str(key) in set(self.datatoday[-1]):
-                self.biddict[key][0] = 0
-            else:
-                self.biddict[key][0] = self.biddict[key][0] + 1
-        self.logger("After BidDict Update:")
-        self.logger("    BidDict: {}".format(str(self.biddict)))
+        if len(self.datatoday) > 0:
+            self.logger("datatoday[-1] = {}".format(str(self.datatoday[-1])))
+            self.logger("Before BidDict Update:")
+            self.logger("    BidDict: {}".format(str(self.biddict)))
+            for key, value in self.biddict.items():
+                if str(key) in set(self.datatoday[-1]):
+                    self.biddict[key][0] = 0
+                else:
+                    self.biddict[key][0] = self.biddict[key][0] + 1
+            self.logger("After BidDict Update:")
+            self.logger("    BidDict: {}".format(str(self.biddict)))
 
     def GetHistoryData(self, driver):
         """
