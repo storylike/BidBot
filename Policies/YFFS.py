@@ -140,7 +140,7 @@ class YFFS(BasePolicy):
         self.logger(str(self.biddict))
 
         # set sleeping interval
-        sleeping = 40
+        sleeping = 60
         cur_time = time.strftime('%H:%M:%S')
         if (cur_time >= '10:12:00') and (cur_time < '22:00:00'):
             sleeping = 120
@@ -184,7 +184,7 @@ class YFFS(BasePolicy):
                 time.sleep(1)
                 # Add to bid list
                 self.driver.find_element_by_css_selector("a[class='btn2'][id='seleall']").click()
-                time.sleep(1)
+                time.sleep(2)
                 # Confirm bid
                 self.driver.find_element_by_css_selector("a[class='btn b3'][id='gamebuy']").click()
                 time.sleep(3)

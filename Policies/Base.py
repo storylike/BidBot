@@ -89,7 +89,7 @@ class BasePolicy(object):
         max_retry_count = 30
         # Set sleeping interval
         cur_time = time.strftime('%H:%M:%S')
-        sleeping = 30
+        sleeping = 40
         if (cur_time >= '10:00:00') and (cur_time < '22:00:00'):
             sleeping = 60
         self.logger("Trying to update today's data...")

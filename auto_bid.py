@@ -266,7 +266,7 @@ if __name__ == '__main__':
             # Start biding
             Policy2.StartBid()
         # Sleeping between biding policies
-        time.sleep(random.randint(20, 35))
+        time.sleep(random.randint(30, 45))
 
 
         ##
