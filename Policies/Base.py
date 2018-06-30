@@ -4,6 +4,7 @@ import urllib.request
 from bs4 import BeautifulSoup
 import datetime
 import sys
+import socket
 sys.path.append('..')
 from config import LSSC_URL, LSSC_DATEFORMAT, DATETIMEFMT
 from urllib.error import URLError
@@ -43,6 +44,7 @@ class BasePolicy(object):
         url = ''.join([LSSC_URL, date_today, '_', date_today])
         retry = 0
         sleeping = 10
+        # Trying to open URL
         while retry < max_retry:
             try:
                 self.logger("Start to open URL, retries = {}".format(str(retry)))
@@ -60,7 +62,17 @@ class BasePolicy(object):
                 sleeping = sleeping + 10
             time.sleep(sleeping)
             retry += 1
-        content = page.read()
+        # Trying to read page
+        retry = 0
+        sleeping = 10
+        while retry < max_retry:
+            try:
+                content = page.read()
+            except socket.timeout as reason:
+                self.logger("Error! Reading page {0}, retries = {1}!".format(str(reason), str(retry)))
+            time.sleep(sleeping)
+            retry += 1
+            sleeping = sleeping * 2
         page.close()
         soup = BeautifulSoup(content, 'html.parser')
         tablelist = soup.findAll("td", attrs={"class": "red big"})
