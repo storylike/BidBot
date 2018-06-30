@@ -45,7 +45,7 @@ class YFFS(BasePolicy):
         self.logger("YFFS Policy: today's data:")
         for items in self.current_bid_list:
             self.logger("        {0}".format(str(items)))
-        for key,value in self.biddict.items():
+        for key, value in self.biddict.items():
             index = -1
             increment = 0
             found = True
@@ -140,29 +140,33 @@ class YFFS(BasePolicy):
         self.logger(str(self.biddict))
 
         # set sleeping interval
-        sleeping = 60
+        sleeping = 30
         cur_time = time.strftime('%H:%M:%S')
         if (cur_time >= '10:12:00') and (cur_time < '22:00:00'):
-            sleeping = 120
+            sleeping = 60
 
         time.sleep(sleeping)
         for key, value in self.biddict.items():
             if (value[0] < 20) and (value[0] != 0xff) and (value[0] in self.bidreferencetable) and (self.bidreferencetable[value[0]] > 0):
                 # Click WuXing
                 time.sleep(3)
-                self.driver.find_element_by_css_selector("a[class='btn b0'][data-bettype='1'][data-subid='12345']").click()
+                wuxing = self.driver.find_element_by_css_selector("a[class='btn b0'][data-bettype='1'][data-subid='12345']")
+                self.wait_and_click(wuxing)
                 time.sleep(2)
                 # Click BuDingWei
-                self.driver.find_element_by_css_selector("a[class='btn b0'][data-bettype='5'][data-subid='1123']").click()
+                budingwei = self.driver.find_element_by_css_selector("a[class='btn b0'][data-bettype='5'][data-subid='1123']")
+                self.wait_and_click(budingwei)
                 time.sleep(2)
                 # WuXingYiMa BuDingWei
-                self.driver.find_element_by_css_selector("input[name='r0'][type='radio'][class='pointer'][value='2_5_112345']").click()
+                wuxingyima = self.driver.find_element_by_css_selector("input[name='r0'][type='radio'][class='pointer'][value='2_5_112345']")
+                self.wait_and_click(wuxingyima)
                 time.sleep(2)
                 # Select Bid Number, 5, e.g.
                 # driver.find_element_by_css_selector("a[data-num='5'][class='isNum']").click()
                 # We should apply actual bid num from biddict:
-                self.driver.find_element_by_css_selector("a[data-num={0}][class='isNum']".format( \
-                    ''.join(["\'", str(key), "\'"]))).click()
+                bidnum = self.driver.find_element_by_css_selector("a[data-num={0}][class='isNum']".format( \
+                    ''.join(["\'", str(key), "\'"])))
+                self.wait_and_click(bidnum)
                 time.sleep(1)
                 # Drag slider bar to leftmost to get most bonus rate
                 dragsource = self.driver.find_element_by_css_selector(
@@ -183,16 +187,18 @@ class YFFS(BasePolicy):
                 select.select_by_value(str(self.bidunit))
                 time.sleep(1)
                 # Add to bid list
-                self.driver.find_element_by_css_selector("a[class='btn2'][id='seleall']").click()
+                addlist = self.driver.find_element_by_css_selector("a[class='btn2'][id='seleall']")
+                self.wait_and_click(addlist)
                 time.sleep(2)
                 # Confirm bid
-                self.driver.find_element_by_css_selector("a[class='btn b3'][id='gamebuy']").click()
+                confirmbid = self.driver.find_element_by_css_selector("a[class='btn b3'][id='gamebuy']")
+                self.wait_and_click(confirmbid)
                 time.sleep(3)
                 # Handle pop ups after bid confirmation
                 # Get last popped up dialog box, that's a bid order confirmation
                 confirm_box = self.driver.find_elements_by_css_selector("button[type='button'][i-id='ok'][class='fix-ui-dialog-autofocus']")[-1]
                 time.sleep(1)
-                confirm_box.click()
+                self.wait_and_click(confirm_box)
                 time.sleep(3)
                 # At last, we should update biddict[key][1] to the actual value we are placing a bid
                 self.biddict[key][1] = self.bidreferencetable[self.biddict[key][0]]

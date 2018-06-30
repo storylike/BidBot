@@ -50,6 +50,7 @@ class BasePolicy(object):
                 self.logger("Start to open URL, retries = {}".format(str(retry)))
                 req = urllib.request.Request(url, headers=request_headers)
                 page = urllib.request.urlopen(req, timeout=40)
+                content = page.read()
                 break
             except URLError as reason:
                 self.logger("Failed to open URL, {0}, retries = {1}".format(str(reason), str(retry)))
@@ -57,22 +58,14 @@ class BasePolicy(object):
             except ConnectionResetError as reason:
                 self.logger("Connection Reset by peer, {0}, retries = {1}".format(str(reason), str(retry)))
                 sleeping = sleeping * 2
+            except socket.timeout as reason:
+                self.logger("Error reading page {0}, retries = {1}!".format(str(reason), str(retry)))
+                sleeping = sleeping + 10
             else:
                 self.logger("Unknown error, retries = {}".format(str(retry)))
                 sleeping = sleeping + 10
             time.sleep(sleeping)
             retry += 1
-        # Trying to read page
-        retry = 0
-        sleeping = 10
-        while retry < max_retry:
-            try:
-                content = page.read()
-            except socket.timeout as reason:
-                self.logger("Error! Reading page {0}, retries = {1}!".format(str(reason), str(retry)))
-            time.sleep(sleeping)
-            retry += 1
-            sleeping = sleeping * 2
         page.close()
         soup = BeautifulSoup(content, 'html.parser')
         tablelist = soup.findAll("td", attrs={"class": "red big"})
@@ -98,10 +91,18 @@ class BasePolicy(object):
         :param self:
         :return:
         """
+        while True:
+            timenow = datetime.datetime.now()
+            if timenow.minute % 5 == 0:
+                self.logger("It's {}, time to update today's data!".format(str(timenow)))
+                break
+            else:
+                self.logger("Sleeping 10 seconds...")
+                time.sleep(10)
         max_retry_count = 30
         # Set sleeping interval
         cur_time = time.strftime('%H:%M:%S')
-        sleeping = 40
+        sleeping = 30
         if (cur_time >= '10:00:00') and (cur_time < '22:00:00'):
             sleeping = 60
         self.logger("Trying to update today's data...")
@@ -196,6 +197,30 @@ class BasePolicy(object):
 
 #    def GotoBidPage(self):
 #        pass
+
+    def wait_and_click(self, element):
+        """
+        wait till an element is clickable, then click this element
+        :param element:
+        :return:
+        """
+        from selenium.common.exceptions import WebDriverException, ElementNotVisibleException
+        maxretry = 4
+        retry = 0
+        sleeping = 10
+        while retry < maxretry:
+            try:
+                element.click()
+                break
+            except WebDriverException as reason:
+                self.logger("WebDriverException when trying to click: {0}".format(reason.msg))
+                self.logger("sleeping {0}".format(str(sleeping)))
+            except ElementNotVisibleException as reason:
+                self.logger("ElementNotVisibleException when trying to click: {0}".format(reason.msg))
+                self.logger("sleeping {0}".format(str(sleeping)))
+            retry = retry + 1
+            time.sleep(sleeping)
+        return
 
     def logger(self, logmsg):
         """
